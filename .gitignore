@@ -43,3 +43,10 @@ local_settings.py
 
 # Eggs (Python packaging)
 .eggs/
+
+# Ignore all migrations
+*/migrations/
+!*/migrations/__init__.py
+
+# Ignore all models.py
+*/models.py
