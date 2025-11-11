@@ -5,16 +5,17 @@ from .forms import SignUpForm
 def home(request):
     return render(request, 'home.html')
 
-def signup(request):
-    if request.method == 'POST':
-        form = SignUpForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            login(request, user)  # Automatically log in the user after signup
-            return redirect('home')  # Redirect to homepage after signup
-    else:
-        form = SignUpForm()
-    return render(request, 'registration/signup.html', {'form': form})
+from django.contrib.auth.forms import UserCreationForm
+from django.views.generic import CreateView
+from django.urls import reverse_lazy
+from django.contrib.auth.models import User
+
+class SignUpView(CreateView):
+    model = User
+    form_class = UserCreationForm
+    template_name = 'registration/signup.html'
+    success_url = reverse_lazy('login') 
+
 
 
 from django.contrib.auth.views import PasswordResetView
