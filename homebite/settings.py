@@ -127,10 +127,5 @@ from django.urls import reverse_lazy
 LOGOUT_REDIRECT_URL = reverse_lazy('home')
 LOGIN_REDIRECT_URL = reverse_lazy('home')
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'bhavani@testpress.in'
-EMAIL_HOST_PASSWORD = 'zijb isbw qyxg czpt'
+
 
