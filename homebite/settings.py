@@ -56,7 +56,7 @@ ROOT_URLCONF = 'homebite.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'accounts' / 'templates'],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -123,9 +123,7 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-from django.urls import reverse_lazy
-LOGOUT_REDIRECT_URL = reverse_lazy('home')
-LOGIN_REDIRECT_URL = reverse_lazy('home')
+
 
 
 

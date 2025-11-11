@@ -1,6 +1,5 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login
-from .forms import SignUpForm
 
 def home(request):
     return render(request, 'home.html')
