@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+
 from django.contrib.auth import login
 
 def home(request):
@@ -13,6 +13,4 @@ class SignUpView(CreateView):
     model = User
     form_class = UserCreationForm
     template_name = 'registration/signup.html'
-    success_url = reverse_lazy('login') 
-
-
+    success_url = reverse_lazy('login')
