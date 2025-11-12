@@ -5,32 +5,19 @@
 {% block content %}
 <div class="container mt-5" style="max-width: 400px;">
     <h2 class="mb-4 text-center">Sign Up</h2>
+
     <form method="post" class="bg-dark p-4 rounded shadow">
         {% csrf_token %}
 
-        <!-- Username -->
+        {% for field in form %}
         <div class="mb-3">
-            <label for="id_username" class="form-label text-light">Username</label>
-            <input type="text" name="username" maxlength="150" class="form-control" id="id_username">
+            {{ field.label_tag(attrs={"class":"form-label text-light"}) }}
+            {{ field|add_class:"form-control" }}
+            {% if field.errors %}
+                <div class="text-danger small">{{ field.errors }}</div>
+            {% endif %}
         </div>
-
-        <!-- Email -->
-        <div class="mb-3">
-            <label for="id_email" class="form-label text-light">Email</label>
-            <input type="email" name="email" class="form-control" id="id_email">
-        </div>
-
-        <!-- Password -->
-        <div class="mb-3">
-            <label for="id_password1" class="form-label text-light">Password</label>
-            <input type="password" name="password1" class="form-control" id="id_password1">
-        </div>
-
-        <!-- Confirm Password -->
-        <div class="mb-3">
-            <label for="id_password2" class="form-label text-light">Confirm Password</label>
-            <input type="password" name="password2" class="form-control" id="id_password2">
-        </div>
+        {% endfor %}
 
         <button type="submit" class="btn btn-primary w-100">Sign Up</button>
     </form>
