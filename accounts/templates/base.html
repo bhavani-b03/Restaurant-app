@@ -19,11 +19,11 @@
 <body class="bg-black text-white">
 
   <!-- Top bar -->
-  <div class="w-full h-20 bg-gradient-to-r from-red-700 via-black to-green-700 flex items-center justify-between px-6 shadow-lg border-b border-gray-800">
+  <div class="w-full h-20 bg-black flex items-center justify-between px-6 border-b border-gray-800">
     <!-- Left: Logo + Brand -->
     <div class="flex items-center gap-2 text-2xl font-bold">
-      <i class="bi bi-shop text-green-400"></i>
-      <span class="bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-green-400">HomeBite</span>
+      <i class="bi bi-shop"></i>
+      <span>HomeBite</span>
     </div>
 
     <!-- Right: Auth links / profile dropdown -->
@@ -31,7 +31,7 @@
       {% if user.is_authenticated %}
         <div class="dropdown">
           <a class="flex items-center gap-2 text-white text-lg dropdown-toggle" href="#" role="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="bi bi-person-circle text-green-400"></i> {{ user.username }}
+            <i class="bi bi-person-circle"></i> {{ user.username }}
           </a>
           <ul class="dropdown-menu dropdown-menu-end bg-white text-black border border-gray-300 rounded mt-2" aria-labelledby="profileDropdown">
             <li>
@@ -43,15 +43,27 @@
           </ul>
         </div>
       {% else %}
-        <!-- Multicolor "spicy + fresh" buttons -->
-        <a href="{% url 'signup' %}" 
-           class="border border-green-400 text-green-400 px-4 py-1.5 rounded-md hover:bg-green-400 hover:text-black transition-colors duration-200 text-sm font-semibold mr-2">
-           Sign Up
-        </a>
-        <a href="{% url 'login' %}" 
-           class="bg-red-600 text-white px-4 py-1.5 rounded-md hover:bg-red-700 transition-colors duration-200 text-sm font-semibold">
-           Login
-        </a>
+<!-- Sign Up Button -->
+      <a href="{% url 'signup' %}" 
+        class="relative inline-block px-4 py-1.5 text-sm font-semibold rounded-md border border-white text-white 
+                bg-transparent 
+                hover:bg-black hover:text-white 
+                focus:bg-black focus:text-white 
+                active:bg-black active:text-white 
+                transition-colors duration-200 mr-2">
+        Sign Up
+      </a>
+
+      <!-- Login Button -->
+      <a href="{% url 'login' %}" 
+        class="relative inline-block px-4 py-1.5 text-sm font-semibold rounded-md bg-white text-black 
+                hover:bg-gray-200 hover:text-black 
+                focus:bg-gray-200 focus:text-black 
+                active:bg-gray-200 active:text-black 
+                transition-colors duration-200">
+        Login
+      </a>
+
       {% endif %}
     </div>
   </div>

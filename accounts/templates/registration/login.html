@@ -4,40 +4,70 @@
 {% block title %}Login - HomeBite{% endblock %}
 
 {% block content %}
-<div class="min-h-[90vh] flex justify-center items-center bg-cover bg-center"
-     style="background-image: url('{% static "accounts/images/auth_page.jpg" %}');">
+<!-- Dark input styles -->
+<style>
+  .auth-form input,
+  .auth-form select,
+  .auth-form textarea {
+    background-color: #1f1f1f; /* dark gray */
+    color: #ffffff;             /* white text */
+    border-radius: 0.5rem;      /* rounded-lg */
+    padding: 0.625rem 1rem;     /* py-2.5 px-4 */
+    border: 1px solid #374151;  /* border-gray-700 */
+  }
 
-  <div class="bg-black/70 text-white rounded-lg shadow-lg p-8 w-full max-w-sm">
-    <h2 class="text-2xl font-semibold text-center mb-6">Login</h2>
+  .auth-form input:focus,
+  .auth-form select:focus,
+  .auth-form textarea:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.5); /* simulate focus:ring-white */
+  }
 
-    <form method="post" class="space-y-4">
-      {% csrf_token %}
+  .auth-form ::placeholder {
+    color: #9ca3af; /* placeholder-gray-400 */
+  }
+</style>
 
-      {% if form.errors %}
-      <div class="bg-red-500 text-white text-sm rounded p-2 mb-3">
-        Please correct the errors below.
-      </div>
-      {% endif %}
+<!-- Background wrapper -->
+<div class="bg-cover bg-center" 
+     style="background-image: url('{% static "accounts/images/auth_page.jpg" %}'); min-height: calc(100vh - 5rem);">
 
-      {% for field in form %}
-      <div class="flex flex-col">
-        <label for="{{ field.id_for_label }}" class="mb-1 font-medium text-sm">{{ field.label }}</label>
-        {{ field }}
-        {% if field.errors %}
-          <p class="text-red-400 text-xs mt-1">{{ field.errors.0 }}</p>
+  <!-- Add some top padding instead of full flex centering -->
+  <div class="flex justify-center w-full pt-16">
+    <div class="auth-form bg-gray-900 text-white rounded-2xl shadow-2xl p-6 w-full max-w-sm backdrop-blur-sm">
+      <h2 class="text-2xl font-semibold text-center mb-6 tracking-wide">Login</h2>
+
+      <form method="post" class="space-y-4">
+        {% csrf_token %}
+
+        {% if form.errors %}
+        <div class="bg-red-600 text-white text-sm rounded-md p-3 mb-3 text-center">
+          Please correct the errors below.
+        </div>
         {% endif %}
+
+        {% for field in form %}
+        <div class="flex flex-col">
+          <label for="{{ field.id_for_label }}" class="mb-2 font-medium text-sm tracking-wide">
+            {{ field.label }}
+          </label>
+          {{ field }}
+          {% if field.errors %}
+            <p class="text-red-400 text-xs mt-1">{{ field.errors.0 }}</p>
+          {% endif %}
+        </div>
+        {% endfor %}
+
+        <button type="submit" class="w-full bg-white text-black font-semibold py-2 rounded-lg hover:bg-gray-200 transition duration-200">
+          Log in
+        </button>
+      </form>
+
+      <div class="mt-4 text-center text-sm text-gray-300">
+        <span>Don’t have an account?
+          <a href="{% url 'signup' %}" class="text-white hover:text-gray-200 underline">Sign Up</a>
+        </span>
       </div>
-      {% endfor %}
-
-      <button type="submit" class="w-full bg-white text-black font-semibold py-2 rounded hover:bg-gray-200 transition duration-200">
-        Login
-      </button>
-    </form>
-
-    <div class="mt-4 text-center text-sm text-gray-300">
-      <span>Don’t have an account?
-        <a href="{% url 'signup' %}" class="text-yellow-400 hover:text-yellow-300 underline">Sign Up</a>
-      </span>
     </div>
   </div>
 </div>
