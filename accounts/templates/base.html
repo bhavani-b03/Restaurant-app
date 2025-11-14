@@ -40,6 +40,12 @@
                 <button type="submit" class="dropdown-item px-4 py-2 hover:bg-gray-200 w-full text-left">Logout</button>
               </form>
             </li>
+
+            <li>
+              <a href="{% url 'password_change' %}" class="dropdown-item px-4 py-2 hover:bg-gray-200 w-full text-left">
+                Change Password
+              </a>
+            </li>
           </ul>
         </div>
       {% else %}
