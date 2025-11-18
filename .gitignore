@@ -44,4 +44,5 @@ local_settings.py
 # Eggs (Python packaging)
 .eggs/
 
+restaurant_images/
 
