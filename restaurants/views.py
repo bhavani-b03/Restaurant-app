@@ -13,7 +13,7 @@ class RestaurantListView(ListView):
     ordering = ['-average_rating']
 
     def get_queryset(self):
-        qs = super().get_queryset().prefetch_related('images')  # fetch images to avoid extra queries
+        qs = super().get_queryset().prefetch_related('images')  
         return qs
 
 
@@ -21,3 +21,7 @@ class RestaurantDetailView(DetailView):
     model = Restaurant
     template_name = "restaurants/detail.html"  
     context_object_name = "restaurant"
+
+
+    def get_queryset(self):
+        return super().get_queryset().prefetch_related('images', 'cuisines')
