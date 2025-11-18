@@ -46,7 +46,7 @@ class Food(TimeStampedModel):
     diet_type = models.IntegerField(choices=DietType.choices, default=DietType.VEG)
     description = models.TextField(blank=True, null=True)  
     cuisines = models.ManyToManyField(Cuisine, related_name='foods', blank=True)  
-    image = models.ImageField(upload_to="food_images/", blank=True, null=True)
+    image = models.ImageField(upload_to="food_images/%Y/%m/%d/", blank=True, null=True)
     def __str__(self):
         return f"{self.name} - {self.restaurant.name}"
 
