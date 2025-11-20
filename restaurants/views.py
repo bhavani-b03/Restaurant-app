@@ -15,14 +15,13 @@ class RestaurantListView(ListView):
     def get_queryset(self):
         qs = super().get_queryset().prefetch_related('images')  # fetch images to avoid extra queries
         if self.request.user.is_authenticated:
-            user_bookmarks = Bookmark.objects.filter(user=self.request.user).values_list("restaurant_id", flat=True)
-            for restaurant in qs:
-                restaurant.is_bookmarked = restaurant.id in user_bookmarks
-        else:
-            for restaurant in qs:
-                restaurant.is_bookmarked = False
-
-        return qs
+            from django.db.models import Exists, OuterRef
+            user_bookmarks = Bookmark.objects.filter(user=self.request.user, restaurant=OuterRef('pk'))
+            qs = qs.annotate(is_bookmarkrd=Exists(user_bookmarks))
+        else :
+            from django.db.models import Value, BooleanField
+            qs = qs.annotate(is_bookmarked=Value(False, output_field=BooleanField()))
+        return qs 
 
 class RestaurantDetailView(DetailView):
     model = Restaurant
@@ -55,7 +54,10 @@ from .models import Bookmark, Restaurant
 @login_required
 def toggle_bookmark(request):
     restaurant_id = request.POST.get("restaurant_id")
-    restaurant = Restaurant.objects.get(id=restaurant_id)
+    try:
+        restaurant = Restaurant.objects.get(id=restaurant_id)
+    except (Restaurant.DoesNotExist, ValueError, TypeError):
+        return JsonResponse({"error": "Invalid restaurant ID"}, status=400)
 
     bookmark, created = Bookmark.objects.get_or_create(
         user=request.user,
