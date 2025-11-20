@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from .models import Restaurant, Food, Cuisine
 from django.views.generic import ListView, DetailView
 
@@ -30,12 +30,10 @@ class FoodListView(ListView):
     context_object_name = "foods"
 
     def get_queryset(self):
-        restaurant_id = self.kwargs.get('restaurant_id')
-        return Food.objects.filter(restaurant_id=restaurant_id).prefetch_related('cuisines')
+        self.restaurant = get_object_or_404(Restaurant, pk=self.kwargs['restaurant_id'])
+        return Food.objects.filter(restaurant=self.restaurant).prefetch_related('cuisines')
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        restaurant_id = self.kwargs.get('restaurant_id')
-        context['restaurant'] = Restaurant.objects.get(id=restaurant_id)
+        context['restaurant'] = self.restaurant
         return context
-
