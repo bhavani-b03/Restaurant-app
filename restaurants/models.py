@@ -38,6 +38,23 @@ class RestaurantQuerySet(models.QuerySet):
             )
         return self.annotate(
             is_bookmarked=Value(False, output_field=BooleanField()))
+    
+    def with_user_visited(self, user):
+        from django.db.models import Exists, OuterRef, Value, BooleanField
+        from restaurants.models import Bookmark  
+        if user.is_authenticated:
+            return self.annotate(
+                is_visited=Exists(
+                    Visited.objects.filter(
+                        user=user,
+                        restaurant=OuterRef('pk')
+                    )
+                )
+            )
+        return self.annotate(
+            is_visited=Value(False, output_field=BooleanField())
+        )
+    
 
 
 class Restaurant(TimeStampedModel):
