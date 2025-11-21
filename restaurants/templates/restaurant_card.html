@@ -1,5 +1,6 @@
-<div class="bg-gray-900 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
-      
+<div class="restaurant-card relative bg-gray-900 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
+     data-bookmarked="{{ restaurant.is_bookmarked|yesno:'true,false' }}"
+     >      
   {% if restaurant.images.first %}
     <img src="{{ restaurant.images.first.image.url }}" alt="{{ restaurant.name }}" class="w-full h-48 object-cover">
   {% else %}
@@ -7,7 +8,16 @@
   {% endif %}
   
   <div class="p-4">
+    <div class="flex justify-between items-center">
     <h2 class="font-bold text-lg">{{ restaurant.name }}</h2>
+    <button class="bookmark-btn" data-id="{{ restaurant.id }}">
+      {% if restaurant.is_bookmarked %}
+        <i class="bi bi-bookmark-fill text-yellow-400 text-xl"></i>
+      {% else %}
+        <i class="bi bi-bookmark text-gray-300 text-xl"></i>
+      {% endif %}
+    </button>
+    </div>  
     <p class="text-gray-400 text-sm flex items-center gap-2 mt-1">
       {{ restaurant.city }} 
       <span class="flex items-center gap-1">

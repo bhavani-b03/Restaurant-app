@@ -23,6 +23,22 @@ class DietType(models.IntegerChoices):
     NON_VEG = 2, 'Non-Vegetarian'
     VEGAN = 3, 'Vegan'
 
+class RestaurantQuerySet(models.QuerySet):
+    def with_user_bookmarks(self, user):
+        from django.db.models import Exists, OuterRef, Value, BooleanField
+        from restaurants.models import Bookmark  
+
+        if user.is_authenticated:
+            user_bookmarks = Bookmark.objects.filter(
+                user=user,
+                restaurant=OuterRef('pk')
+            )
+            return self.annotate(
+                is_bookmarked=Exists(user_bookmarks)
+            )
+        return self.annotate(
+            is_bookmarked=Value(False, output_field=BooleanField()))
+
 
 class Restaurant(TimeStampedModel):
     name = models.CharField(max_length=200, unique=True)  
@@ -35,6 +51,8 @@ class Restaurant(TimeStampedModel):
     closing_time = models.TimeField()
     is_spotlight = models.BooleanField(default=False)
     cuisines = models.ManyToManyField(Cuisine, related_name='restaurants', blank=True)  # A restaurant may start without cuisines
+
+    objects = RestaurantQuerySet.as_manager()
 
     def __str__(self):
         return self.name
