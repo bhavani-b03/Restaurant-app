@@ -69,6 +69,19 @@
     {% endfor %}
   </div>
 
+<div class="flex items-center gap-3">
+    <button 
+      class="visit-btn px-4 py-1.5 rounded-md font-semibold text-white
+             {% if restaurant.is_visited %}bg-red-700 hover:bg-red-800{% else %}bg-red-500 hover:bg-red-600{% endif %}"
+      data-id="{{ restaurant.id }}"
+      onclick="toggleVisited(event)">
+      {% if restaurant.is_visited %}
+        Unvisit
+      {% else %}
+        Visit
+      {% endif %}
+    </button>
+
   <!-- View Button -->
   <a 
     href="{{ restaurant.get_foods_url }}" 
@@ -76,6 +89,8 @@
            hover:bg-blue-700 transition-colors duration-200 whitespace-nowrap">
     View
   </a>
+</div>
 
 </div>
+{% include "scripts.html" %}
 {% endblock %}
