@@ -167,35 +167,43 @@
   </div>
 
   <!-- Reviews List -->
-  <div class="mt-8 space-y-6">
-
+  <div class="mt-8 space-y-4">
     {% for review in restaurant.reviews.all %}
-    <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+    <div class="flex items-start gap-3">
 
-      <div class="flex items-center gap-3">
-        <img src="https://api.dicebear.com/7.x/personas/svg?seed={{ review.user.username }}"
-             class="w-10 h-10 rounded-full"
-             alt="profile">
-        <div>
-          <p class="font-semibold">{{ review.user.username }}</p>
-          <div class="flex items-center gap-1 text-yellow-400">
-            <span>{{ review.rating }}</span>
-            <i class="bi bi-star-fill text-sm"></i>
-          </div>
+      <!-- Profile -->
+      <img src="https://api.dicebear.com/7.x/personas/svg?seed={{ review.user.username }}"
+          class="w-10 h-10 rounded-full bg-gray-700 p-1 object-cover"
+          alt="profile">
+
+      <!-- Comment Content -->
+      <div class="flex-1">
+
+        <!-- Username + Time inline -->
+        <p class="text-[11px] font-semibold text-gray-300 flex items-center gap-1">
+          {{ review.user.username }}
+          <span class="text-[9px] font-normal text-gray-500">
+            • {{ review.created_at|date:"M d, Y" }}
+          </span>
+        </p>
+
+        <!-- Rating -->
+        <div class="flex items-center gap-1 text-yellow-400 text-xs mb-1">
+          <span>{{ review.rating }}</span>
+          <i class="bi bi-star-fill text-[10px]"></i>
         </div>
+
+        <!-- Comment Text -->
+        <p class="text-gray-300 text-xs leading-snug">
+          {{ review.comment }}
+        </p>
+
       </div>
-
-      <p class="text-gray-300 text-sm mt-3">{{ review.comment }}</p>
-
-      <p class="text-gray-500 text-xs mt-2">
-        {{ review.created_at|date:"M d, Y" }}
-      </p>
 
     </div>
     {% empty %}
       <p class="text-gray-500 text-sm">No reviews yet.</p>
     {% endfor %}
-
   </div>
 </div>
 {% include "visited_script.html" %}
