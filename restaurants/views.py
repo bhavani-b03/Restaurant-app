@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404
-from .models import Restaurant, Food, Cuisine, Bookmark, Visited
+from .models import Restaurant, Food, Cuisine, Bookmark, Visited, Review
 from django.views.generic import ListView, DetailView
+from django.db.models import Count
 
 # Create your views here.
 
@@ -24,6 +25,35 @@ class RestaurantDetailView(DetailView):
     def get_queryset(self):
         return super().get_queryset().prefetch_related('images', 'cuisines').with_user_visited(self.request.user)
     
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        restaurant = self.object
+
+        rating_counts = restaurant.reviews.values('rating').annotate(count=Count('rating'))
+
+        rating_data = {str(i): 0 for i in range(1, 6)}
+        for r in rating_counts:
+            rating_data[str(r['rating'])] = r['count']
+
+        total = sum(rating_data.values()) or 1
+        rating_percentage = {
+            star: round((count / total) * 100)
+            for star, count in rating_data.items()
+        }
+
+        # ⭐ Make a combined list for direct looping in template
+        rating_stats = [
+            {
+                "star": star,
+                "percentage": rating_percentage[star],
+                "count": rating_data[star],
+            }
+            for star in ["5", "4", "3", "2", "1"]
+        ]
+
+        context["rating_stats"] = rating_stats
+        return context
+
 class FoodListView(ListView):
     model = Food
     template_name = "foods/list.html"
@@ -83,3 +113,13 @@ def toggle_visited(request):
 
     return JsonResponse({"visited": True})
 
+@login_required
+def add_review(request):
+    restaurant = Restaurant.objects.get(id=request.POST.get("restaurant_id"))
+    Review.objects.create(
+        user=request.user,
+        restaurant=restaurant,
+        rating=request.POST.get("rating"),
+        comment=request.POST.get("comment"),
+    )
+    return JsonResponse({"success": True})

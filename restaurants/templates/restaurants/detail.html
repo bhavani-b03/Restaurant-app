@@ -92,5 +92,111 @@
 </div>
 
 </div>
+
+<!-- Ratings & Reviews -->
+<div class="mt-10 text-white">
+
+  <!-- Header -->
+  <h2 class="text-2xl font-bold mb-4">Ratings & Reviews</h2>
+
+  <!-- Rating Summary like Play Store -->
+  <div class="flex gap-6 items-center">
+
+    <!-- Average Rating -->
+    <div class="text-center">
+      <div class="text-5xl font-extrabold text-white">
+        {{ restaurant.average_rating }}
+      </div>
+      <div class="flex justify-center mt-1 text-yellow-400 text-xl">
+        <i class="bi bi-star-fill"></i>
+      </div>
+      <p class="text-gray-400 text-xs mt-1">
+        Based on {{ restaurant.reviews.count }} reviews
+      </p>
+    </div>
+
+    <!-- Breakdown Bars -->
+    <div class="flex flex-col gap-2 text-sm mt-4">
+      {% for item in rating_stats %}
+        <div class="flex items-center gap-2">
+          <span class="text-white font-medium">{{ item.star }}⭐</span>
+
+          <div class="w-40 h-2 bg-white rounded-full overflow-hidden">
+            <div class="h-2 bg-yellow-400"
+                style="width: calc({{ item.percentage }}%)">
+            </div>
+          </div>
+
+          <span class="text-gray-300 text-xs">({{ item.count }})</span>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Write Review Button -->
+  <button 
+    class="mt-6 px-4 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white font-semibold"
+    id="writeReviewBtn">
+    Write a Review
+  </button>
+
+  <!-- Review Popup -->
+  <div id="reviewPopup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+    <div class="bg-gray-900 p-6 rounded-lg w-96">
+      <h3 class="text-white text-xl font-bold mb-3">Write a Review</h3>
+
+      <form id="reviewForm">
+        <div class="flex items-center gap-1 mb-3" id="starSelect">
+          {% for i in "12345" %}
+            <i class="bi bi-star text-gray-400 text-2xl cursor-pointer" data-value="{{ forloop.counter }}"></i>
+          {% endfor %}
+        </div>
+
+        <textarea name="comment" class="w-full p-2 rounded bg-gray-800 text-white mb-3"
+          placeholder="Share your experience..." rows="3"></textarea>
+
+        <div class="flex justify-end gap-2">
+          <button type="button" id="cancelReview" class="px-3 py-1 bg-gray-600 rounded">Cancel</button>
+          <button type="submit" class="px-3 py-1 bg-green-600 rounded">Submit</button>
+        </div>
+
+        <input type="hidden" name="rating" id="ratingValue">
+        <input type="hidden" name="restaurant_id" value="{{ restaurant.id }}">
+      </form>
+    </div>
+  </div>
+
+  <!-- Reviews List -->
+  <div class="mt-8 space-y-6">
+
+    {% for review in restaurant.reviews.all %}
+    <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+
+      <div class="flex items-center gap-3">
+        <img src="https://api.dicebear.com/7.x/personas/svg?seed={{ review.user.username }}"
+             class="w-10 h-10 rounded-full"
+             alt="profile">
+        <div>
+          <p class="font-semibold">{{ review.user.username }}</p>
+          <div class="flex items-center gap-1 text-yellow-400">
+            <span>{{ review.rating }}</span>
+            <i class="bi bi-star-fill text-sm"></i>
+          </div>
+        </div>
+      </div>
+
+      <p class="text-gray-300 text-sm mt-3">{{ review.comment }}</p>
+
+      <p class="text-gray-500 text-xs mt-2">
+        {{ review.created_at|date:"M d, Y" }}
+      </p>
+
+    </div>
+    {% empty %}
+      <p class="text-gray-500 text-sm">No reviews yet.</p>
+    {% endfor %}
+
+  </div>
+</div>
 {% include "visited_script.html" %}
 {% endblock %}

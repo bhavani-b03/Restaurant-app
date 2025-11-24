@@ -61,3 +61,57 @@ visitedFilterBtn.addEventListener("click", () => {
     });
 });
 </script>
+<script>
+const reviewPopup = document.getElementById("reviewPopup");
+const reviewBtn = document.getElementById("writeReviewBtn");
+const cancelReview = document.getElementById("cancelReview");
+const starSelect = document.querySelectorAll("#starSelect i");
+const ratingValue = document.getElementById("ratingValue");
+const reviewForm = document.getElementById("reviewForm");
+
+reviewBtn.addEventListener("click", () => {
+  reviewPopup.classList.remove("hidden");
+});
+
+cancelReview.addEventListener("click", () => {
+  reviewPopup.classList.add("hidden");
+});
+
+// Selecting rating stars (interactive)
+starSelect.forEach(star => {
+  star.addEventListener("click", () => {
+    const value = star.dataset.value;
+    ratingValue.value = value;
+
+    starSelect.forEach(s => {
+      if (s.dataset.value <= value) {
+        s.classList.remove("text-gray-400");
+        s.classList.add("text-yellow-400");
+      } else {
+        s.classList.add("text-gray-400");
+        s.classList.remove("text-yellow-400");
+      }
+    });
+  });
+});
+
+// Submit review
+reviewForm.addEventListener("submit", function(e) {
+  e.preventDefault();
+
+  fetch("{% url 'restaurants:add_review' %}", {
+    method: "POST",
+    headers: {
+      "X-CSRFToken": "{{ csrf_token }}",
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: new URLSearchParams(new FormData(reviewForm)),
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      location.reload(); // refresh to show new review
+    }
+  });
+});
+</script>
