@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from .models import Restaurant, Food, Cuisine, Bookmark, Visited, Review
 from django.views.generic import ListView, DetailView
 from django.db.models import Count, Avg
+from django.db import transaction
 
 # Create your views here.
 
@@ -113,17 +114,33 @@ def toggle_visited(request):
 
     return JsonResponse({"visited": True})
 
+@require_POST
 @login_required
-def add_review(request):
-    restaurant = Restaurant.objects.get(id=request.POST.get("restaurant_id"))
-    Review.objects.create(
+@transaction.atomic
+def add_review(request, restaurant_id):
+    try:
+        restaurant = Restaurant.objects.get(id=request.POST.get("restaurant_id"))
+    except (Restaurant.DoesNotExist, ValueError, TypeError):
+        return JsonResponse({"success": False, "error": "Invalid restaurant ID"}, status=400)
+    
+    rating_str = request.POST.get("rating")
+    try:
+        rating = int(rating_str)
+        if not (1 <= rating <= 5):
+            raise ValueError()
+    except (ValueError, TypeError):
+        return JsonResponse({"success": False, "error": "Invalid rating value."}, status=400)
+
+    Review.objects.update_or_create(
         user=request.user,
         restaurant=restaurant,
-        rating=request.POST.get("rating"),
-        comment=request.POST.get("comment"),
+        defaults={
+            "rating": rating,
+            "comment": request.POST.get("comment", ""),
+        },
     )
 
     avg_rating = restaurant.reviews.aggregate(Avg('rating'))['rating__avg'] or 0
     restaurant.average_rating = round(avg_rating, 1)  # round to 1 decimal
-    restaurant.save()
+    restaurant.save(update_fields=['average_rating'])
     return JsonResponse({"success": True})
