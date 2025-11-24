@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from .models import Restaurant, Food, Cuisine, Bookmark, Visited, Review
 from django.views.generic import ListView, DetailView
-from django.db.models import Count
+from django.db.models import Count, Avg
 
 # Create your views here.
 
@@ -122,4 +122,8 @@ def add_review(request):
         rating=request.POST.get("rating"),
         comment=request.POST.get("comment"),
     )
+
+    avg_rating = restaurant.reviews.aggregate(Avg('rating'))['rating__avg'] or 0
+    restaurant.average_rating = round(avg_rating, 1)  # round to 1 decimal
+    restaurant.save()
     return JsonResponse({"success": True})
