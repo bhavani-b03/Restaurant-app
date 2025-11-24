@@ -99,7 +99,7 @@ starSelect.forEach(star => {
 reviewForm.addEventListener("submit", function(e) {
   e.preventDefault();
 
-  fetch("{% url 'restaurants:add_review' %}", {
+  fetch("{% url 'restaurants:add_review' restaurant.id %}", {
     method: "POST",
     headers: {
       "X-CSRFToken": "{{ csrf_token }}",
@@ -107,11 +107,26 @@ reviewForm.addEventListener("submit", function(e) {
     },
     body: new URLSearchParams(new FormData(reviewForm)),
   })
-  .then(res => res.json())
+    .then(res => {
+    if (!res.ok) {
+      // If server returns an error, try to parse it as JSON
+      return res.json().then(errorData => {
+        throw new Error(errorData.error || `Server error: ${res.status}`);
+      }).catch(() => {
+        // If parsing fails, throw a generic error
+        throw new Error(`Server error: ${res.status}`);
+      });
+    }
+    return res.json();
+  })
   .then(data => {
     if (data.success) {
       location.reload(); // refresh to show new review
     }
+  })
+  .catch(error => {
+    console.error('Failed to submit review:', error);
+    alert(`Error: ${error.message}`);
   });
 });
 </script>
