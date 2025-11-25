@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 from django.urls import reverse
-
+from .managers import RestaurantQuerySet
 
 class TimeStampedModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)  
@@ -35,6 +35,8 @@ class Restaurant(TimeStampedModel):
     closing_time = models.TimeField()
     is_spotlight = models.BooleanField(default=False)
     cuisines = models.ManyToManyField(Cuisine, related_name='restaurants', blank=True)  # A restaurant may start without cuisines
+
+    objects = RestaurantQuerySet.as_manager()
 
     def __str__(self):
         return self.name

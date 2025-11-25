@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404
-from .models import Restaurant, Food, Cuisine
+from .models import Restaurant, Food, Cuisine, Bookmark
 from django.views.generic import ListView, DetailView
 
 # Create your views here.
@@ -13,7 +13,7 @@ class RestaurantListView(ListView):
     ordering = ['-average_rating']
 
     def get_queryset(self):
-        qs = super().get_queryset().prefetch_related('images')  # fetch images to avoid extra queries
+        qs = super().get_queryset().prefetch_related('images').with_user_bookmarks(self.request.user)
         return qs
 
 class RestaurantDetailView(DetailView):
@@ -37,3 +37,28 @@ class FoodListView(ListView):
         context = super().get_context_data(**kwargs)
         context['restaurant'] = self.restaurant
         return context
+
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
+from .models import Bookmark, Restaurant
+
+@require_POST
+@login_required
+def toggle_bookmark(request):
+    restaurant_id = request.POST.get("restaurant_id")
+    try:
+        restaurant = Restaurant.objects.get(id=restaurant_id)
+    except (Restaurant.DoesNotExist, ValueError, TypeError):
+        return JsonResponse({"error": "Invalid restaurant ID"}, status=400)
+
+    bookmark, created = Bookmark.objects.get_or_create(
+        user=request.user,
+        restaurant=restaurant
+    )
+
+    if not created:
+        bookmark.delete()
+        return JsonResponse({"bookmarked": False})
+
+    return JsonResponse({"bookmarked": True})
