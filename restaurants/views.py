@@ -2,7 +2,6 @@ from django.shortcuts import render, get_object_or_404
 from .models import Restaurant, Food, Cuisine, Bookmark, Visited, Review
 from django.views.generic import ListView, DetailView
 from django.db.models import Count, Avg
-from django.db import transaction
 
 # Create your views here.
 
