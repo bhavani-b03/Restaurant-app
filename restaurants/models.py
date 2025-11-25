@@ -23,6 +23,7 @@ class DietType(models.IntegerChoices):
     NON_VEG = 2, 'Non-Vegetarian'
     VEGAN = 3, 'Vegan'
 
+
 class Restaurant(TimeStampedModel):
     name = models.CharField(max_length=200, unique=True)  
     city = models.CharField(max_length=100)
