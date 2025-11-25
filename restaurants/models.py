@@ -46,6 +46,16 @@ class Restaurant(TimeStampedModel):
     
     def get_foods_url(self):
         return reverse("restaurants:restaurant_foods", kwargs={"restaurant_id": self.pk})
+    
+    def update_average_rating(self):
+        reviews = self.reviews.all()
+        if reviews.exists():
+            avg = reviews.aggregate(models.Avg('rating'))['rating__avg']
+            self.average_rating = round(avg, 1)
+        else:
+            self.average_rating = 0.0
+        self.save()
+
 
 class Food(TimeStampedModel):
     restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE, related_name='menu')
