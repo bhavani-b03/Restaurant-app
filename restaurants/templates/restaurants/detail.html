@@ -169,7 +169,7 @@
   <!-- Reviews List -->
   <div class="mt-8 space-y-4">
     {% for review in restaurant.reviews.all %}
-    <div class="review-card flex items-start gap-3">
+    <div class="review-card flex items-start gap-3" data-review-id="{{ review.id }}">
 
       <!-- Profile -->
       <img src="https://api.dicebear.com/7.x/personas/svg?seed={{ review.user.username }}"

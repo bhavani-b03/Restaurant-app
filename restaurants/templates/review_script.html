@@ -121,6 +121,7 @@ document.querySelectorAll(".delete-review-btn").forEach(btn => {
     if (data.success) {
         const reviewCard = btn.closest(".review-card");
         if(reviewCard) reviewCard.remove();
+        location.reload();
 
         // Update average rating dynamically
         const avgEl = document.getElementById("avg-rating");
