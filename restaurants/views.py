@@ -22,7 +22,7 @@ class RestaurantDetailView(DetailView):
     context_object_name = "restaurant"
 
     def get_queryset(self):
-        return super().get_queryset().prefetch_related('images', 'cuisines')
+        return super().get_queryset().prefetch_related('images', 'cuisines').with_user_visited(self.request.user)
     
 class FoodListView(ListView):
     model = Food
