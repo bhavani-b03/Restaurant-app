@@ -10,4 +10,5 @@ urlpatterns = [
     path("bookmark/toggle/", views.toggle_bookmark, name="toggle_bookmark"),
     path("visited/toggle/", views.toggle_visited, name="toggle_visited"),
     path("<int:restaurant_id>/add-review/", views.add_review, name="add_review"),
+    path("delete-review/", views.delete_review, name="delete_review"),
 ]

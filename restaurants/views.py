@@ -114,33 +114,44 @@ def toggle_visited(request):
 
     return JsonResponse({"visited": True})
 
-@require_POST
 @login_required
-@transaction.atomic
+@require_POST
 def add_review(request, restaurant_id):
-    try:
-        restaurant = Restaurant.objects.get(id=request.POST.get("restaurant_id"))
-    except (Restaurant.DoesNotExist, ValueError, TypeError):
-        return JsonResponse({"success": False, "error": "Invalid restaurant ID"}, status=400)
-    
-    rating_str = request.POST.get("rating")
-    try:
-        rating = int(rating_str)
-        if not (1 <= rating <= 5):
-            raise ValueError()
-    except (ValueError, TypeError):
-        return JsonResponse({"success": False, "error": "Invalid rating value."}, status=400)
+    restaurant = get_object_or_404(Restaurant, id=restaurant_id)
+    rating = int(request.POST.get("rating"))
+    comment = request.POST.get("comment")
 
-    Review.objects.update_or_create(
+    review, created = Review.objects.update_or_create(
         user=request.user,
         restaurant=restaurant,
-        defaults={
-            "rating": rating,
-            "comment": request.POST.get("comment", ""),
-        },
+        defaults={"rating": rating, "comment": comment}
     )
 
-    avg_rating = restaurant.reviews.aggregate(Avg('rating'))['rating__avg'] or 0
-    restaurant.average_rating = round(avg_rating, 1)  # round to 1 decimal
-    restaurant.save(update_fields=['average_rating'])
-    return JsonResponse({"success": True})
+    restaurant.update_average_rating()
+
+    return JsonResponse({
+        "success": True,
+        "rating": review.rating,
+        "comment": review.comment,
+        "average_rating": restaurant.average_rating
+    })
+
+@login_required
+@require_POST
+def delete_review(request):
+    try:
+        review_id = request.POST.get("review_id")
+        review = Review.objects.get(id=review_id, user=request.user)
+        restaurant = review.restaurant
+        review.delete()
+        restaurant.update_average_rating()
+        return JsonResponse({
+            "success": True, 
+            "average_rating": restaurant.average_rating,
+            "review_count": restaurant.reviews.count()
+        })
+    except Review.DoesNotExist:
+        return JsonResponse({"success": False, "error": "Review not found"})
+    except Exception as e:
+        return JsonResponse({"success": False, "error": str(e)})
+

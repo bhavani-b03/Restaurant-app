@@ -27,7 +27,7 @@
       </p>
     </div>
 
-    <div class="flex items-center gap-1 text-yellow-400 text-xl font-semibold">
+    <div class="flex items-center gap-1 text-yellow-400 text-xl font-semibold" id="avg-rating">
       {{ restaurant.average_rating }}
       <i class="bi bi-star-fill"></i>
     </div>
@@ -104,14 +104,14 @@
 
     <!-- Average Rating -->
     <div class="text-center">
-      <div class="text-5xl font-extrabold text-white">
+      <div class="text-5xl font-extrabold text-white" id="avg-rating">
         {{ restaurant.average_rating }}
       </div>
       <div class="flex justify-center mt-1 text-yellow-400 text-xl">
         <i class="bi bi-star-fill"></i>
       </div>
       <p class="text-gray-400 text-xs mt-1">
-        Based on {{ restaurant.reviews.count }} reviews
+        Based on <span id="review-count">{{ restaurant.reviews.count }}</span> reviews
       </p>
     </div>
 
@@ -169,7 +169,7 @@
   <!-- Reviews List -->
   <div class="mt-8 space-y-4">
     {% for review in restaurant.reviews.all %}
-    <div class="flex items-start gap-3">
+    <div class="review-card flex items-start gap-3">
 
       <!-- Profile -->
       <img src="https://api.dicebear.com/7.x/personas/svg?seed={{ review.user.username }}"
@@ -177,27 +177,49 @@
           alt="profile">
 
       <!-- Comment Content -->
-      <div class="flex-1">
+      <div class="flex-1 relative">
 
-        <!-- Username + Time inline -->
-        <p class="text-[11px] font-semibold text-gray-300 flex items-center gap-1">
-          {{ review.user.username }}
-          <span class="text-[9px] font-normal text-gray-500">
-            • {{ review.created_at|date:"M d, Y" }}
-          </span>
-        </p>
+          <!-- Username + Time inline -->
+          <p class="text-[11px] font-semibold text-gray-300 flex items-center gap-1">
+            {{ review.user.username }}
+            <span class="text-[9px] font-normal text-gray-500">
+              • {{ review.created_at|date:"M d, Y" }}
+            </span>
+          </p>
 
-        <!-- Rating -->
-        <div class="flex items-center gap-1 text-yellow-400 text-xs mb-1">
-          <span>{{ review.rating }}</span>
-          <i class="bi bi-star-fill text-[10px]"></i>
-        </div>
+          <!-- Rating -->
+          <div class="flex items-center gap-1 text-yellow-400 text-xs mb-1">
+            <span>{{ review.rating }}</span>
+            <i class="bi bi-star-fill text-[10px]"></i>
+          </div>
 
-        <!-- Comment Text -->
-        <p class="text-gray-300 text-xs leading-snug">
-          {{ review.comment }}
-        </p>
+          <!-- Comment Text -->
+          <p class="review-comment text-gray-300 text-xs leading-snug">
+            {{ review.comment }}
+          </p>
 
+          {% if review.user == request.user %}
+          <!-- Three Dots Menu -->
+          <div class="absolute top-0 right-0">
+            <div class="dropdown">
+              <button class="bi bi-three-dots-vertical text-gray-400 cursor-pointer" 
+                      id="reviewDropdown{{ review.id }}" data-bs-toggle="dropdown" aria-expanded="false"></button>
+              <ul class="dropdown-menu dropdown-menu-end bg-gray-900 text-white border border-gray-700 rounded mt-2"
+                  aria-labelledby="reviewDropdown{{ review.id }}">
+                <li>
+                  <button class="dropdown-item edit-review-btn text-white hover:!text-black active:!text-white" data-review-id="{{ review.id }}">
+                    Edit
+                  </button>
+                </li>
+                <li>
+                  <button class="dropdown-item delete-review-btn text-white hover:!text-black active:!text-white" data-review-id="{{ review.id }}">
+                    Delete
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+          {% endif %}
       </div>
 
     </div>
