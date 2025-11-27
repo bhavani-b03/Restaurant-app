@@ -6,6 +6,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .forms import ReviewForm
 from django.urls import reverse
 # Create your views here.
+DEFAULT_MIN_PRICE = 0
+DEFAULT_MAX_PRICE = 100000
 
 class RestaurantListView(ListView):
     model = Restaurant
