@@ -11,4 +11,5 @@ urlpatterns = [
     path("visited/toggle/", views.toggle_visited, name="toggle_visited"),
     path("<int:restaurant_id>/add-review/", views.AddReviewView.as_view(), name="add_review"),
     path("delete-review/<int:pk>/", views.DeleteReviewView.as_view(), name="delete_review"),
+    path("filter/price/", views.filter_by_price, name="filter_by_price"),
 ]

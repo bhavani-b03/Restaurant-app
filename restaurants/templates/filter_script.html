@@ -1,0 +1,88 @@
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const filterBtn = document.getElementById("filterBtn");
+    const filterDropdown = document.getElementById("filterDropdown");
+    const priceBtn = document.getElementById("priceBtn");
+    const priceDropdown = document.getElementById("priceDropdown");
+    const applyPriceBtn = document.getElementById("applyPriceBtn");
+    const minPriceInput = document.getElementById("startPrice");
+    const maxPriceInput = document.getElementById("endPrice");
+    const grid = document.querySelector(".grid");
+
+    if (!filterBtn || !priceDropdown || !applyPriceBtn || !grid) return; // safety check
+
+    // Toggle popup
+    filterBtn.addEventListener("click", () => {
+        filterDropdown.classList.toggle("hidden");
+    });
+
+    priceBtn.addEventListener("click", () => {
+        priceDropdown.classList.toggle("hidden");
+    });
+
+
+    // Apply price filter
+    applyPriceBtn.addEventListener("click", () => {
+        const minPrice = minPriceInput.value;
+        const maxPrice = maxPriceInput.value;
+
+        // Example AJAX fetch to filter restaurants (adjust your URL)
+        fetch("{% url 'restaurants:filter_by_price' %}", {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": "{{ csrf_token }}",
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: new URLSearchParams({ min_price: minPrice, max_price: maxPrice })
+        })
+        .then(res => res.json())
+        .then(data => {
+            grid.innerHTML = data.html; // replace restaurants grid
+            priceDropdown.classList.add("hidden"); // hide popup
+        })
+        .catch(err => console.error(err));
+    }); 
+
+    grid.addEventListener("click", function(e) {
+        const btn = e.target.closest(".bookmark-btn"); // <--- FIX
+        if (!btn){
+            const card = e.target.closest(".restaurant-card");
+            if (card) {
+                window.location.href = card.dataset.id ;
+            }
+            return;
+        }
+
+        const restaurantId = btn.dataset.id;
+
+        fetch("/restaurants/bookmark/toggle/", {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": document.cookie
+                    .split(";")
+                    .find(c => c.trim().startsWith("csrftoken"))
+                    .split("=")[1],
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: new URLSearchParams({ restaurant_id: restaurantId })
+        })
+        .then(res => res.json())
+        .then(data => {
+
+                const icon = btn.querySelector("i");
+                const card = btn.closest('.restaurant-card');
+
+                if (data.bookmarked) {
+                    icon.classList.remove("bi-bookmark");
+                    icon.classList.add("bi-bookmark-fill", "text-yellow-400");
+                    card.dataset.bookmarked = "true";
+                } else {
+                    icon.classList.remove("bi-bookmark-fill", "text-yellow-400");
+                    icon.classList.add("bi-bookmark", "text-gray-300");
+                    card.dataset.bookmarked = "false";
+                }
+
+        });
+    });
+});
+</script>

@@ -5,6 +5,7 @@ from django.db.models import Count, Avg
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .forms import ReviewForm
 from django.urls import reverse
+from django.template.loader import render_to_string
 # Create your views here.
 
 class RestaurantListView(ListView):
@@ -132,3 +133,29 @@ class DeleteReviewView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
     def get_success_url(self):
         return reverse('restaurants:restaurant_detail', kwargs={'pk': self.object.restaurant.id})
+
+@require_POST
+def filter_by_price(request):
+    min_price = request.POST.get("min_price")
+    max_price = request.POST.get("max_price")
+
+    # Convert to integer safely
+    try:
+        min_price = int(min_price)
+    except (ValueError, TypeError):
+        min_price = 0
+
+    try:
+        max_price = int(max_price)
+    except (ValueError, TypeError):
+        max_price = 100000  # some high default
+
+    # Filter restaurants
+    restaurants = Restaurant.objects.filter(cost_for_two__gte=min_price, cost_for_two__lte=max_price)
+
+    # Render only restaurant cards
+    html = ""
+    for restaurant in restaurants:
+        html += render_to_string("restaurant_card.html", {"restaurant": restaurant}, request=request)
+
+    return JsonResponse({"html": html})
