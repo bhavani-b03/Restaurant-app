@@ -7,6 +7,8 @@ from .forms import ReviewForm
 from django.urls import reverse
 from django.template.loader import render_to_string
 # Create your views here.
+DEFAULT_MIN_PRICE = 0
+DEFAULT_MAX_PRICE = 100000
 
 class RestaurantListView(ListView):
     model = Restaurant
@@ -121,6 +123,7 @@ class AddReviewView(LoginRequiredMixin, UpdateView):
 class DeleteReviewView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Review
 
+<<<<<<< HEAD
     def test_func(self):
         return self.get_object().user == self.request.user
 
@@ -134,6 +137,8 @@ class DeleteReviewView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def get_success_url(self):
         return reverse('restaurants:restaurant_detail', kwargs={'pk': self.object.restaurant.id})
 
+=======
+>>>>>>> 9535690 (refactor:remove redundant bookmark handling code)
 @require_POST
 def filter_by_price(request):
     min_price = request.POST.get("min_price")
@@ -143,19 +148,20 @@ def filter_by_price(request):
     try:
         min_price = int(min_price)
     except (ValueError, TypeError):
-        min_price = 0
+        min_price = DEFAULT_MIN_PRICE
 
     try:
         max_price = int(max_price)
     except (ValueError, TypeError):
-        max_price = 100000  # some high default
+        max_price = DEFAULT_MAX_PRICE
 
     # Filter restaurants
     restaurants = Restaurant.objects.filter(cost_for_two__gte=min_price, cost_for_two__lte=max_price)
 
     # Render only restaurant cards
     html = ""
-    for restaurant in restaurants:
-        html += render_to_string("restaurant_card.html", {"restaurant": restaurant}, request=request)
-
+    html = "".join(
+        f'<a href="{restaurant.get_absolute_url()}">{render_to_string("restaurant_card.html", {"restaurant": restaurant}, request=request)}</a>'
+        for restaurant in restaurants
+    )
     return JsonResponse({"html": html})
