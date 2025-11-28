@@ -20,6 +20,16 @@ class RestaurantListView(ListView):
 
     def get_queryset(self):
         qs = super().get_queryset().prefetch_related('images').with_user_bookmarks(self.request.user).with_user_visited(self.request.user)
+
+        start = self.request.GET.get("start")
+        end = self.request.GET.get("end")
+
+        if start and end:
+            start = int(start)
+            end = int(end)
+            print(list(qs))
+            qs = qs.filter(cost_for_two__gte=start, cost_for_two__lte=end)
+
         return qs
 
 class RestaurantDetailView(DetailView):

@@ -19,31 +19,5 @@ document.addEventListener("DOMContentLoaded", function() {
     priceBtn.addEventListener("click", () => {
         priceDropdown.classList.toggle("hidden");
     });
-
-
-    // Apply price filter
-    applyPriceBtn.addEventListener("click", () => {
-        const minPrice = minPriceInput.value;
-        const maxPrice = maxPriceInput.value;
-
-        // Example AJAX fetch to filter restaurants (adjust your URL)
-        fetch("{% url 'restaurants:filter_by_price' %}", {
-            method: "POST",
-            headers: {
-                "X-CSRFToken": "{{ csrf_token }}",
-                "Content-Type": "application/x-www-form-urlencoded"
-            },
-            body: new URLSearchParams({ min_price: minPrice, max_price: maxPrice })
-        })
-        .then(res => res.json())
-        .then(data => {
-            grid.innerHTML = data.html; // replace restaurants grid
-            initBookmarkButtons();
-            priceDropdown.classList.add("hidden"); // hide popup
-
-            
-        })
-        .catch(err => console.error(err));
-    }); 
 });
 </script>
