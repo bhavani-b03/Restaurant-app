@@ -135,7 +135,7 @@
 
   <!-- Write Review Button -->
   <button 
-    class="mt-6 px-4 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white font-semibold"
+    class="open-review mt-6 px-4 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white font-semibold"
     id="writeReviewBtn">
     Write a Review
   </button>
@@ -145,7 +145,8 @@
     <div class="bg-gray-900 p-6 rounded-lg w-96">
       <h3 class="text-white text-xl font-bold mb-3">Write a Review</h3>
 
-      <form id="reviewForm">
+      <form id="reviewForm" action="{% url 'restaurants:add_review' restaurant.id %}" method="POST">
+        {% csrf_token %}
         <div class="flex items-center gap-1 mb-3" id="starSelect">
           {% for i in "12345" %}
             <i class="bi bi-star text-gray-400 text-2xl cursor-pointer" data-value="{{ forloop.counter }}"></i>
@@ -207,14 +208,15 @@
               <ul class="dropdown-menu dropdown-menu-end bg-gray-900 text-white border border-gray-700 rounded mt-2"
                   aria-labelledby="reviewDropdown{{ review.id }}">
                 <li>
-                  <button class="dropdown-item edit-review-btn text-white hover:!text-black active:!text-white" data-review-id="{{ review.id }}">
-                    Edit
+                  <button class="open-review dropdown-item edit-review-btn text-white hover:!text-black active:!text-white" data-review-id="{{ review.id }}">
+                    Edit 
                   </button>
                 </li>
                 <li>
-                  <button class="dropdown-item delete-review-btn text-white hover:!text-black active:!text-white" data-review-id="{{ review.id }}">
-                    Delete
-                  </button>
+                  <form action="{% url 'restaurants:delete_review' review.id %}" method="POST" class="inline">
+                      {% csrf_token %}
+                      <button type="submit" class="dropdown-item text-white hover:!text-black">Delete</button>
+                  </form>
                 </li>
               </ul>
             </div>

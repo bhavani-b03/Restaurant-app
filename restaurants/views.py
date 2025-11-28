@@ -1,7 +1,8 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from .models import Restaurant, Food, Cuisine, Bookmark, Visited, Review
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, CreateView, DeleteView, UpdateView
 from django.db.models import Count, Avg
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
 # Create your views here.
 
@@ -113,44 +114,43 @@ def toggle_visited(request):
 
     return JsonResponse({"visited": True})
 
-@login_required
-@require_POST
-def add_review(request, restaurant_id):
-    restaurant = get_object_or_404(Restaurant, id=restaurant_id)
-    rating = int(request.POST.get("rating"))
-    comment = request.POST.get("comment")
+class AddReviewView(LoginRequiredMixin, UpdateView):  
+    model = Review
+    fields = ["rating", "comment"]
+    template_name = "restaurants/detail.html"
 
-    review, created = Review.objects.update_or_create(
-        user=request.user,
-        restaurant=restaurant,
-        defaults={"rating": rating, "comment": comment}
-    )
+    def get_object(self, queryset=None):
+        restaurant_id = self.kwargs["restaurant_id"]
+        restaurant = get_object_or_404(Restaurant, id=restaurant_id)
 
-    restaurant.update_average_rating()
+        # Look for an existing review by this user
+        review = Review.objects.filter(user=self.request.user, restaurant=restaurant).first()
 
-    return JsonResponse({
-        "success": True,
-        "rating": review.rating,
-        "comment": review.comment,
-        "average_rating": restaurant.average_rating
-    })
+        # If no review exists → create a new instance but DON'T save yet
+        if not review:
+            review = Review(user=self.request.user, restaurant=restaurant)
 
-@login_required
-@require_POST
-def delete_review(request):
-    try:
-        review_id = request.POST.get("review_id")
-        review = Review.objects.get(id=review_id, user=request.user)
-        restaurant = review.restaurant
-        review.delete()
+        self.restaurant = restaurant
+        return review
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["restaurant"] = self.restaurant
+        return context
+
+    def form_valid(self, form):
+        review = form.save()
+        review.restaurant.update_average_rating()
+        return redirect("restaurants:restaurant_detail", pk=self.restaurant.id)
+
+class DeleteReviewView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Review
+    template_name = "restaurants/confirm_delete.html"  # minimal template for confirmation
+
+    def test_func(self):
+        return self.get_object().user == self.request.user
+
+    def get_success_url(self):
+        restaurant = self.object.restaurant
         restaurant.update_average_rating()
-        return JsonResponse({
-            "success": True, 
-            "average_rating": restaurant.average_rating,
-            "review_count": restaurant.reviews.count()
-        })
-    except Review.DoesNotExist:
-        return JsonResponse({"success": False, "error": "Review not found"})
-    except Exception as e:
-        return JsonResponse({"success": False, "error": str(e)})
-
+        return redirect('restaurants:restaurant_detail', pk=restaurant.id).url
