@@ -17,20 +17,22 @@ class RestaurantListView(ListView):
     paginate_by = 10  
 
     ordering = ['-average_rating']
-
-    def get_queryset(self):
-        qs = super().get_queryset().prefetch_related('images').with_user_bookmarks(self.request.user).with_user_visited(self.request.user)
-
+    
+    def filter_price(self, qs):
         start = self.request.GET.get("start")
         end = self.request.GET.get("end")
 
         if start and end:
-            start = int(start)
-            end = int(end)
-            print(list(qs))
-            qs = qs.filter(cost_for_two__gte=start, cost_for_two__lte=end)
-
+            return qs.filter(cost_for_two__gte=int(start), cost_for_two__lte=int(end))
+        return qs    
+    
+    def apply_filters(self, qs):
+        qs = self.filter_price(qs)
         return qs
+
+    def get_queryset(self):
+        qs = super().get_queryset().prefetch_related('images').with_user_bookmarks(self.request.user).with_user_visited(self.request.user)
+        return self.apply_filters(qs)
 
 class RestaurantDetailView(DetailView):
     model = Restaurant
@@ -133,7 +135,6 @@ class AddReviewView(LoginRequiredMixin, UpdateView):
 class DeleteReviewView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Review
 
-<<<<<<< HEAD
     def test_func(self):
         return self.get_object().user == self.request.user
 
@@ -146,32 +147,3 @@ class DeleteReviewView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
     def get_success_url(self):
         return reverse('restaurants:restaurant_detail', kwargs={'pk': self.object.restaurant.id})
-
-=======
->>>>>>> 9535690 (refactor:remove redundant bookmark handling code)
-@require_POST
-def filter_by_price(request):
-    min_price = request.POST.get("min_price")
-    max_price = request.POST.get("max_price")
-
-    # Convert to integer safely
-    try:
-        min_price = int(min_price)
-    except (ValueError, TypeError):
-        min_price = DEFAULT_MIN_PRICE
-
-    try:
-        max_price = int(max_price)
-    except (ValueError, TypeError):
-        max_price = DEFAULT_MAX_PRICE
-
-    # Filter restaurants
-    restaurants = Restaurant.objects.filter(cost_for_two__gte=min_price, cost_for_two__lte=max_price)
-
-    # Render only restaurant cards
-    html = ""
-    html = "".join(
-        f'<a href="{restaurant.get_absolute_url()}">{render_to_string("restaurant_card.html", {"restaurant": restaurant}, request=request)}</a>'
-        for restaurant in restaurants
-    )
-    return JsonResponse({"html": html})
