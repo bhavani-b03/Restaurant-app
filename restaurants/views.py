@@ -3,7 +3,8 @@ from .models import Restaurant, Food, Cuisine, Bookmark, Visited, Review
 from django.views.generic import ListView, DetailView, CreateView, DeleteView, UpdateView
 from django.db.models import Count, Avg
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-
+from .forms import ReviewForm
+from django.urls import reverse
 # Create your views here.
 
 class RestaurantListView(ListView):
@@ -24,36 +25,14 @@ class RestaurantDetailView(DetailView):
     context_object_name = "restaurant"
 
     def get_queryset(self):
-        return super().get_queryset().prefetch_related('images', 'cuisines').with_user_visited(self.request.user)
+        return super().get_queryset().prefetch_related('images', 'cuisines', 'reviews__user').with_user_visited(self.request.user)
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        restaurant = self.object
-
-        rating_counts = restaurant.reviews.values('rating').annotate(count=Count('rating'))
-
-        rating_data = {str(i): 0 for i in range(1, 6)}
-        for r in rating_counts:
-            rating_data[str(r['rating'])] = r['count']
-
-        total = sum(rating_data.values()) or 1
-        rating_percentage = {
-            star: round((count / total) * 100)
-            for star, count in rating_data.items()
-        }
-
-        # ⭐ Make a combined list for direct looping in template
-        rating_stats = [
-            {
-                "star": star,
-                "percentage": rating_percentage[star],
-                "count": rating_data[star],
-            }
-            for star in ["5", "4", "3", "2", "1"]
-        ]
-
-        context["rating_stats"] = rating_stats
+        context["reviews"] = self.object.reviews.select_related('user').all()
+        context["rating_stats"] = self.object.get_rating_stats()
         return context
+
 
 class FoodListView(ListView):
     model = Food
@@ -116,21 +95,16 @@ def toggle_visited(request):
 
 class AddReviewView(LoginRequiredMixin, UpdateView):  
     model = Review
-    fields = ["rating", "comment"]
     template_name = "restaurants/detail.html"
+    form_class = ReviewForm
 
     def get_object(self, queryset=None):
-        restaurant_id = self.kwargs["restaurant_id"]
-        restaurant = get_object_or_404(Restaurant, id=restaurant_id)
-
-        # Look for an existing review by this user
-        review = Review.objects.filter(user=self.request.user, restaurant=restaurant).first()
-
-        # If no review exists → create a new instance but DON'T save yet
-        if not review:
-            review = Review(user=self.request.user, restaurant=restaurant)
-
-        self.restaurant = restaurant
+        self.restaurant = get_object_or_404(Restaurant, id=self.kwargs["restaurant_id"])
+        review, created = Review.objects.get_or_create(
+            user=self.request.user,
+            restaurant=self.restaurant,
+            defaults={"rating": 0, "comment": ""}
+        )
         return review
 
     def get_context_data(self, **kwargs):
@@ -145,12 +119,16 @@ class AddReviewView(LoginRequiredMixin, UpdateView):
 
 class DeleteReviewView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Review
-    template_name = "restaurants/confirm_delete.html"  # minimal template for confirmation
 
     def test_func(self):
         return self.get_object().user == self.request.user
 
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        restaurant = self.object.restaurant  # save restaurant before deletion
+        response = super().delete(request, *args, **kwargs)
+        restaurant.update_average_rating()  # update after deletion
+        return response
+
     def get_success_url(self):
-        restaurant = self.object.restaurant
-        restaurant.update_average_rating()
-        return redirect('restaurants:restaurant_detail', pk=restaurant.id).url
+        return reverse('restaurants:restaurant_detail', kwargs={'pk': self.object.restaurant.id})

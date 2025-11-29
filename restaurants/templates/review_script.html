@@ -4,6 +4,8 @@ const reviewBtn = document.getElementById("writeReviewBtn");
 const cancelReview = document.getElementById("cancelReview");
 const starSelect = document.querySelectorAll("#starSelect i");
 const ratingValue = document.getElementById("ratingValue");
+const popup = document.getElementById("deleteConfirmPopup");
+const cancelBtn = document.getElementById("cancelDeleteBtn");
 
 document.querySelectorAll(".open-review").forEach(btn => {
   btn.addEventListener("click", () => {
@@ -32,4 +34,15 @@ starSelect.forEach(star => {
     });
   });
 });
+
+cancelBtn.addEventListener("click", () => {
+  popup.classList.add("hidden"); 
+});
+
+document.querySelectorAll(".delete-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    popup.classList.remove("hidden"); 
+  });
+});
+
 </script>

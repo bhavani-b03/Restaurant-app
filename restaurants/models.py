@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.urls import reverse
 from .managers import RestaurantQuerySet
+from django.db.models import Count, Avg
 
 class TimeStampedModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)  
@@ -55,6 +56,25 @@ class Restaurant(TimeStampedModel):
         else:
             self.average_rating = 0.0
         self.save()
+
+    def get_rating_stats(self):
+        rating_counts = self.reviews.values('rating').annotate(count=Count('rating'))
+
+        rating_data = {str(i): 0 for i in range(1, 6)}
+        for r in rating_counts:
+            rating_data[str(r['rating'])] = r['count']
+
+        total = sum(rating_data.values()) or 1  # avoid divide by zero
+        rating_percentage = {
+            star: round((count / total) * 100)
+            for star, count in rating_data.items()
+        }
+
+        rating_stats = [
+            {"star": star, "percentage": rating_percentage[star], "count": rating_data[star]}
+            for star in ["5", "4", "3", "2", "1"]
+        ]
+        return rating_stats
 
 
 class Food(TimeStampedModel):
