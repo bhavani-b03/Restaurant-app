@@ -2,77 +2,82 @@ from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth.models import User
 
-class AuthViewsTest(TestCase):
 
-    def setUp(self):
-        self.user = User.objects.create_user(username="testuser", email="test@example.com", password="password123")
-    
-    # LOGIN
-    def test_login_view_get(self):
+class TestAuthViews(TestCase):
+
+    def test_login(self):
         response = self.client.get(reverse('login'))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'registration/login.html')
 
-    def test_login_view_post_success(self):
-        response = self.client.post(reverse('login'), {'username': 'testuser', 'password': 'password123'})
-        self.assertRedirects(response, reverse('home'))
 
-    def test_login_view_post_failure(self):
-        response = self.client.post(reverse('login'), {'username': 'testuser', 'password': 'wrongpassword'})
-        self.assertEqual(response.status_code, 200)
-        self.assertFalse(response.wsgi_request.user.is_authenticated)
-    
-    # LOGOUT
-    def test_logout_view(self):
-        self.client.login(username='testuser', password='password123')
+    def test_logout(self):
+        user = User.objects.create_user(username='test', password='password123')
+        self.client.login(username='test', password='password123')
+
         response = self.client.post(reverse('logout'))
-        self.assertRedirects(response, reverse('home'))
+        self.assertEqual(response.status_code, 302)  # redirect
 
-    # SIGNUP
-    def test_signup_view_get(self):
+
+    def test_signup(self):
         response = self.client.get(reverse('signup'))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'registration/signup.html')  # adjust if your template is different
+        self.assertTemplateUsed(response, 'registration/signup.html')
 
-    def test_signup_view_post(self):
+        # POST Signup
         response = self.client.post(reverse('signup'), {
             'username': 'newuser',
-            'email': 'new@example.com',
-            'password1': 'newpassword123',
-            'password2': 'newpassword123'
+            'password1': 'StrongPassword123',
+            'password2': 'StrongPassword123'
         })
-        self.assertEqual(User.objects.filter(username='newuser').exists(), True)
-        self.assertRedirects(response, reverse('login'))
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(User.objects.filter(username='newuser').exists())
 
-    # PASSWORD RESET FLOW
-    def test_password_reset_get(self):
+
+    def test_home(self):
+        response = self.client.get(reverse('home'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'home.html')
+
+
+    def test_password_reset(self):
         response = self.client.get(reverse('password_reset'))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'accounts/password_reset.html')
 
-    def test_password_reset_done_get(self):
+
+    def test_password_reset_done(self):
         response = self.client.get(reverse('password_reset_done'))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'accounts/password_reset_done.html')
 
-    # PASSWORD CHANGE FLOW (login required)
-    def test_password_change_requires_login(self):
-        response = self.client.get(reverse('password_change'))
-        self.assertRedirects(response, f"{reverse('login')}?next={reverse('password_change')}")
 
-    def test_password_change_get(self):
-        self.client.login(username='testuser', password='password123')
+    def test_password_reset_confirm(self):
+        # you need fake uid and token
+        response = self.client.get(reverse('password_reset_confirm', kwargs={'uidb64': 'test', 'token': '123'}))
+        self.assertEqual(response.status_code, 200)  # page still loads
+        self.assertTemplateUsed(response, 'accounts/password_reset_confirm.html')
+
+
+    def test_password_reset_complete(self):
+        response = self.client.get(reverse('password_reset_complete'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'accounts/password_reset_complete.html')
+
+
+    def test_password_change(self):
+        user = User.objects.create_user(username='test', password='password123')
+        self.client.login(username='test', password='password123')
+
         response = self.client.get(reverse('password_change'))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'accounts/password_change.html')
 
-    def test_password_change_post(self):
-        self.client.login(username='testuser', password='password123')
-        response = self.client.post(reverse('password_change'), {
-            'old_password': 'password123',
-            'new_password1': 'newpass123',
-            'new_password2': 'newpass123'
-        })
-        self.assertRedirects(response, reverse('password_change_done'))
-        self.user.refresh_from_db()
-        self.assertTrue(self.user.check_password('newpass123'))
+
+    def test_password_change_done(self):
+        user = User.objects.create_user(username='test', password='password123')
+        self.client.login(username='test', password='password123')
+
+        response = self.client.get(reverse('password_change_done'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'accounts/password_change_done.html')

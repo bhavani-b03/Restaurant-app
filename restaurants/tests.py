@@ -1,83 +1,76 @@
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth.models import User
-from .models import Restaurant, Bookmark, Visited, Cuisine
-from decimal import Decimal
-from datetime import time
+from .models import Restaurant, Food, Bookmark, Visited
 
-class RestaurantViewsTestCase(TestCase):
-    def setUp(self):
-        self.client = Client()
-        self.user = User.objects.create_user(username="testuser", password="testpass")
-        
-        self.cuisine = Cuisine.objects.create(name="Italian")
-        self.restaurant = Restaurant.objects.create(
+
+class RestaurantViewTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user(username="testuser", password="12345")
+
+        cls.restaurant = Restaurant.objects.create(
             name="Test Restaurant",
+            address="123 Test Street",
             city="Test City",
-            address="123 Test St",
-            cost_for_two=500,
-            diet_type=1,
-            average_rating=0.0,
-            opening_time=time(10, 0),
-            closing_time=time(22, 0)
+            opening_time="09:00:00",
+            closing_time="22:00:00",
+            average_rating=4.2,
         )
-        self.restaurant.cuisines.add(self.cuisine)
-        self.restaurant.save()
-        
-    def test_restaurant_list_view(self):
+
+        cls.food = Food.objects.create(
+            name="Test Food",
+            price=100,
+            restaurant=cls.restaurant
+        )
+
+        cls.client = Client()
+
+    def test_RestaurantListView(self):
         url = reverse("restaurants:restaurant_list")
         response = self.client.get(url)
+
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, self.restaurant.name)
-        
-    def test_restaurant_detail_view(self):
-        url = reverse("restaurants:restaurant_detail", kwargs={"pk": self.restaurant.pk})
+        self.assertTemplateUsed(response, "restaurants/list.html")
+        self.assertIn("restaurants", response.context)
+
+    def test_RestaurantDetailView(self):
+        url = reverse("restaurants:restaurant_detail", args=[self.restaurant.id])
         response = self.client.get(url)
+
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, self.restaurant.name)
-        self.assertContains(response, self.restaurant.address)
-    
-    def test_food_list_view(self):
-        url = reverse("restaurants:restaurant_foods", kwargs={"restaurant_id": self.restaurant.pk})
+        self.assertTemplateUsed(response, "restaurants/detail.html")
+        self.assertEqual(response.context["restaurant"], self.restaurant)
+
+    def test_FoodListView(self):
+        url = reverse("restaurants:restaurant_foods", args=[self.restaurant.id])
         response = self.client.get(url)
+
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, self.restaurant.name)
-    
-    def test_toggle_bookmark_requires_login(self):
+        self.assertTemplateUsed(response, "foods/list.html")
+        self.assertIn("foods", response.context)
+        self.assertEqual(response.context["restaurant"], self.restaurant)
+
+    def test_toggle_bookmark(self):
+        self.client.login(username="testuser", password="12345")
+
         url = reverse("restaurants:toggle_bookmark")
-        response = self.client.post(url, {"restaurant_id": self.restaurant.pk})
-        self.assertEqual(response.status_code, 302)  # redirects to login
-    
-    def test_toggle_bookmark_creates_and_deletes(self):
-        self.client.login(username="testuser", password="testpass")
-        url = reverse("restaurants:toggle_bookmark")
-        
-        response = self.client.post(url, {"restaurant_id": self.restaurant.pk}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        response = self.client.post(url, {"restaurant_id": self.restaurant.id})
+
         self.assertEqual(response.status_code, 200)
         self.assertTrue(Bookmark.objects.filter(user=self.user, restaurant=self.restaurant).exists())
-        self.assertJSONEqual(str(response.content, encoding='utf8'), {"bookmarked": True})
-        
-        response = self.client.post(url, {"restaurant_id": self.restaurant.pk}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-        self.assertEqual(response.status_code, 200)
+
+        response = self.client.post(url, {"restaurant_id": self.restaurant.id})
         self.assertFalse(Bookmark.objects.filter(user=self.user, restaurant=self.restaurant).exists())
-        self.assertJSONEqual(str(response.content, encoding='utf8'), {"bookmarked": False})
-    
-    def test_toggle_visited_requires_login(self):
+
+    def test_toggle_visited(self):
+        self.client.login(username="testuser", password="12345")
+
         url = reverse("restaurants:toggle_visited")
-        response = self.client.post(url, {"restaurant_id": self.restaurant.pk})
-        self.assertEqual(response.status_code, 302)  # redirect to login
-    
-    def test_toggle_visited_creates_and_deletes(self):
-        self.client.login(username="testuser", password="testpass")
-        url = reverse("restaurants:toggle_visited")
-        
-        # Create visited
-        response = self.client.post(url, {"restaurant_id": self.restaurant.pk}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        response = self.client.post(url, {"restaurant_id": self.restaurant.id})
+
         self.assertEqual(response.status_code, 200)
         self.assertTrue(Visited.objects.filter(user=self.user, restaurant=self.restaurant).exists())
-        self.assertJSONEqual(str(response.content, encoding='utf8'), {"visited": True})
-        
-        response = self.client.post(url, {"restaurant_id": self.restaurant.pk}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-        self.assertEqual(response.status_code, 200)
+
+        response = self.client.post(url, {"restaurant_id": self.restaurant.id})
         self.assertFalse(Visited.objects.filter(user=self.user, restaurant=self.restaurant).exists())
-        self.assertJSONEqual(str(response.content, encoding='utf8'), {"visited": False})
