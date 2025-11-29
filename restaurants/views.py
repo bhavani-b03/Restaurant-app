@@ -16,20 +16,22 @@ class RestaurantListView(ListView):
     paginate_by = 10  
 
     ordering = ['-average_rating']
-
-    def get_queryset(self):
-        qs = super().get_queryset().prefetch_related('images').with_user_bookmarks(self.request.user).with_user_visited(self.request.user)
-
+    
+    def filter_price(self, qs):
         start = self.request.GET.get("start")
         end = self.request.GET.get("end")
 
         if start and end:
-            start = int(start)
-            end = int(end)
-            print(list(qs))
-            qs = qs.filter(cost_for_two__gte=start, cost_for_two__lte=end)
-
+            return qs.filter(cost_for_two__gte=int(start), cost_for_two__lte=int(end))
+        return qs    
+    
+    def apply_filters(self, qs):
+        qs = self.filter_price(qs)
         return qs
+
+    def get_queryset(self):
+        qs = super().get_queryset().prefetch_related('images').with_user_bookmarks(self.request.user).with_user_visited(self.request.user)
+        return self.apply_filters(qs)
 
 class RestaurantDetailView(DetailView):
     model = Restaurant
