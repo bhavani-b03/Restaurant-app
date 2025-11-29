@@ -38,22 +38,38 @@ class TestFoodListView(FoodMixin):
 
 
 class TestToggleBookmark(RestaurantMixin):
-    def test_user_should_toggle_bookmark(self):
+    def test_user_should_toggle_bookmark_on(self):
         self.login()
         url = reverse("restaurants:toggle_bookmark")
         response = self.client.post(url, {"restaurant_id": self.restaurant.id})
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(
-            Bookmark.objects.filter(user=self.user, restaurant=self.restaurant).exists()
-        )
+        self.assertTrue(Bookmark.objects.filter(user=self.user, restaurant=self.restaurant).exists())
+        self.assertJSONEqual(response.content, {"bookmarked": True})
+
+    def test_user_should_toggle_bookmark_off(self):
+        self.login()
+        Bookmark.objects.create(user=self.user, restaurant=self.restaurant)
+        url = reverse("restaurants:toggle_bookmark")
+        response = self.client.post(url, {"restaurant_id": self.restaurant.id})
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(Bookmark.objects.filter(user=self.user, restaurant=self.restaurant).exists())
+        self.assertJSONEqual(response.content, {"bookmarked": False})
 
 
 class TestToggleVisited(RestaurantMixin):
-    def test_user_should_toggle_visited_status(self):
+    def test_user_should_toggle_visited_on(self):
         self.login()
         url = reverse("restaurants:toggle_visited")
         response = self.client.post(url, {"restaurant_id": self.restaurant.id})
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(
-            Visited.objects.filter(user=self.user, restaurant=self.restaurant).exists()
-        )
+        self.assertTrue(Visited.objects.filter(user=self.user, restaurant=self.restaurant).exists())
+        self.assertJSONEqual(response.content, {"visited": True})
+
+    def test_user_should_toggle_visited_off(self):
+        self.login()
+        Visited.objects.create(user=self.user, restaurant=self.restaurant)
+        url = reverse("restaurants:toggle_visited")
+        response = self.client.post(url, {"restaurant_id": self.restaurant.id})
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(Visited.objects.filter(user=self.user, restaurant=self.restaurant).exists())
+        self.assertJSONEqual(response.content, {"visited": False})
