@@ -54,7 +54,7 @@ class RestaurantListView(ListView):
 
         if rating_values:
             numbers = [int(r) for r in rating_values if r.isdigit()]
-            return qs.filter(average_rating__gte=min(numbers))  # Show restaurants >= selected rating
+            return qs.filter(average_rating__in=numbers)
 
         return qs
     

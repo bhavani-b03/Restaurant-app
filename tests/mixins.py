@@ -38,7 +38,7 @@ class RestaurantMixin(UserMixin):
             name="Burger King",
             address="Street 1",
             diet_type=1,  # integer for DietType choices
-            average_rating=4.5,
+            average_rating=5,
             cost_for_two=400,
             opening_time=datetime.time(9, 0),
             closing_time=datetime.time(22, 0)
