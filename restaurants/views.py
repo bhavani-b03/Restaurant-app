@@ -22,6 +22,8 @@ class RestaurantListView(ListView):
         context = super().get_context_data(**kwargs)
         diet_map = {1: "Veg", 2: "Non Veg", 3: "Vegan"}
         context['diet_choices'] = [(value, diet_map[value]) for value, _ in DietType.choices]
+        context['cuisines'] = Cuisine.objects.all()
+        context['selected_cuisines'] = self.request.GET.getlist("cuisine")
         return context
     
     def filter_price(self, qs):
@@ -31,12 +33,19 @@ class RestaurantListView(ListView):
         if start and end:
             return qs.filter(cost_for_two__gte=int(start), cost_for_two__lte=int(end))
         return qs    
-    
+
     def filter_diet_type(self, qs):
         diet_types = self.request.GET.getlist("diet_type")
         if diet_types:
             diet_types_int = [int(dt) for dt in diet_types if dt.isdigit()]
             return qs.filter(diet_type__in=diet_types_int)
+        return qs
+    
+    def filter_cuisine(self, qs):
+        cuisine_ids = self.request.GET.getlist("cuisine")
+        if cuisine_ids:
+            cuisine_ids_int = [int(c) for c in cuisine_ids if c.isdigit()]
+            return qs.filter(cuisines__id__in=cuisine_ids_int).distinct()
         return qs
     
     def apply_filters(self, qs):
