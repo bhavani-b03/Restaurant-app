@@ -68,6 +68,29 @@
             </div>
         </div>
 
+        <!-- Rating Filter -->
+        <div class="relative">
+            <button id="ratingBtn" class="w-full text-left bg-gray-700 hover:bg-gray-600 text-white px-2 py-1 rounded mb-2">
+                Rating
+            </button>
+
+            <div id="ratingDropdown" class="absolute right-full top-0 mr-2 w-40 bg-gray-900 text-white p-3 rounded shadow-lg hidden z-50">
+                <form method="get" action="{% url 'restaurants:restaurant_list' %}">
+
+                    {% for rating in rating_choices %}
+                    <label class="flex items-center gap-2 mb-1">
+                        <input type="checkbox" name="rating" value="{{ rating }}"
+                        {% if rating in selected_ratings %}checked{% endif %}>
+                        ⭐ {{ rating }}+
+                    </label>
+                    {% endfor %}
+
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-1 rounded font-semibold mt-2">
+                        Apply
+                    </button>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 
