@@ -18,6 +18,22 @@ class TestRestaurantListView(RestaurantTestSetupMixin, TestCase):
         response = self.client.get(reverse("restaurants:restaurant_list"))
         self.assertContains(response, self.restaurant.get_absolute_url())
 
+    def test_price_filter_should_include_restaurants_within_range(self):
+        response = self.client.get(
+            reverse("restaurants:restaurant_list") + "?start=100&end=300"
+        )
+        included = [r for r in self.restaurants if 100 <= r.cost_for_two <= 300]
+        for r in included:
+            self.assertContains(response, r.name)
+
+    def test_price_filter_should_exclude_restaurants_outside_range(self):
+        response = self.client.get(
+            reverse("restaurants:restaurant_list") + "?start=100&end=300"
+        )
+        excluded = [r for r in self.restaurants if r.cost_for_two < 100 or r.cost_for_two > 300]
+        for r in excluded:
+            self.assertNotContains(response, r.name)
+
 
 class TestRestaurantDetailView(RestaurantTestSetupMixin, TestCase):
     def test_detail_page_should_display_correct_restaurant(self):
