@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.urls import reverse
 from .managers import RestaurantQuerySet
+from django.db.models import Count, Avg
 
 class TimeStampedModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)  
@@ -46,6 +47,35 @@ class Restaurant(TimeStampedModel):
     
     def get_foods_url(self):
         return reverse("restaurants:restaurant_foods", kwargs={"restaurant_id": self.pk})
+    
+    def update_average_rating(self):
+        reviews = self.reviews.all()
+        if reviews.exists():
+            avg = reviews.aggregate(models.Avg('rating'))['rating__avg']
+            self.average_rating = round(avg, 1)
+        else:
+            self.average_rating = 0.0
+        self.save()
+
+    def get_rating_stats(self):
+        rating_counts = self.reviews.values('rating').annotate(count=Count('rating'))
+
+        rating_data = {str(i): 0 for i in range(1, 6)}
+        for item in rating_counts:
+            rating_data[str(item['rating'])] = item['count']
+
+        total_reviews = sum(rating_data.values()) or 1  # avoid divide by zero
+        rating_percentage = {
+            star: round((count / total_reviews) * 100)
+            for star, count in rating_data.items()
+        }
+
+        rating_stats = [
+            {"star": star, "percentage": rating_percentage[star], "count": rating_data[star]}
+            for star in ["5", "4", "3", "2", "1"]
+        ]
+        return rating_stats
+
 
 class Food(TimeStampedModel):
     restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE, related_name='menu')

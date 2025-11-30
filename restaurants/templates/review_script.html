@@ -1,0 +1,48 @@
+<script>
+const reviewPopup = document.getElementById("reviewPopup");
+const reviewBtn = document.getElementById("writeReviewBtn");
+const cancelReview = document.getElementById("cancelReview");
+const starSelect = document.querySelectorAll("#starSelect i");
+const ratingValue = document.getElementById("ratingValue");
+const popup = document.getElementById("deleteConfirmPopup");
+const cancelBtn = document.getElementById("cancelDeleteBtn");
+
+document.querySelectorAll(".open-review").forEach(btn => {
+  btn.addEventListener("click", () => {
+    reviewPopup.classList.remove("hidden");
+  });
+});
+
+cancelReview.addEventListener("click", () => {
+  reviewPopup.classList.add("hidden");
+});
+
+// Selecting rating stars (interactive)
+starSelect.forEach(star => {
+  star.addEventListener("click", () => {
+    const value = star.dataset.value;
+    ratingValue.value = value;
+
+    starSelect.forEach(s => {
+      if (s.dataset.value <= value) {
+        s.classList.remove("text-gray-400");
+        s.classList.add("text-yellow-400");
+      } else {
+        s.classList.add("text-gray-400");
+        s.classList.remove("text-yellow-400");
+      }
+    });
+  });
+});
+
+cancelBtn.addEventListener("click", () => {
+  popup.classList.add("hidden"); 
+});
+
+document.querySelectorAll(".delete-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    popup.classList.remove("hidden"); 
+  });
+});
+
+</script>
