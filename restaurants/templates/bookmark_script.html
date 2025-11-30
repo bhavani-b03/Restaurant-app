@@ -42,9 +42,13 @@ function toggleBookmark(event) {
     });
 }
 
-document.querySelectorAll(".bookmark-btn").forEach(btn => {
-    btn.addEventListener("click", toggleBookmark);
-});
+function initBookmarkButtons() {
+    document.querySelectorAll(".bookmark-btn").forEach(btn => {
+        btn.removeEventListener("click", toggleBookmark); // remove old listeners first
+        btn.addEventListener("click", toggleBookmark);
+    });
+}
+
 
 const bookmarkFilterBtn = document.getElementById("bookmarkFilterBtn");
 

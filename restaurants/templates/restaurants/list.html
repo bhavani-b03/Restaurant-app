@@ -6,6 +6,8 @@
     <h1 class="text-3xl font-bold mt-6 mb-4 text-gray-100">Restaurants</h1>
 
     <div class="flex items-center gap-4">
+        {% include "filters.html" %}
+
         <button id="visitedFilterBtn" class="text-gray-300 hover:text-yellow-400">
             <i class="bi bi-eye-fill text-xl"></i>
         </button>
@@ -29,4 +31,5 @@
 </div>
 {% include "bookmark_script.html" %}
 {% include "visited_script.html" %}
+{% include "filter_script.html" %}
 {% endblock %}
