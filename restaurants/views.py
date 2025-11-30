@@ -51,6 +51,7 @@ class RestaurantListView(ListView):
     def apply_filters(self, qs):
         qs = self.filter_price(qs)
         qs = self.filter_diet_type(qs)
+        qs = self.filter_cuisine(qs)
         return qs
     
     def get_queryset(self):
