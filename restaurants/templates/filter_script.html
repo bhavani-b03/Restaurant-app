@@ -8,6 +8,8 @@ document.addEventListener("DOMContentLoaded", function() {
     const minPriceInput = document.getElementById("startPrice");
     const maxPriceInput = document.getElementById("endPrice");
     const grid = document.querySelector(".grid");
+    const dietBtn = document.getElementById("dietBtn");
+    const dietDropdown = document.getElementById("dietDropdown");
 
     if (!filterBtn || !priceDropdown || !applyPriceBtn || !grid) return; // safety check
 
@@ -18,6 +20,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
     priceBtn.addEventListener("click", () => {
         priceDropdown.classList.toggle("hidden");
+    });
+
+    dietBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        dietDropdown.classList.toggle("hidden");
     });
 });
 </script>
