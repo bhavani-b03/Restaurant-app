@@ -24,7 +24,27 @@
                 </form>
             </div>
         </div>
+        <!-- Diet Type Option inside dropdown -->
+        <div class="relative">
+            <button id="dietBtn" class="w-full text-left bg-gray-700 hover:bg-gray-600 text-white px-2 py-1 rounded mb-2 relative">
+                Diet Type
+            </button>
 
+            <div id="dietDropdown" class="absolute right-full top-0 mr-2 w-40 bg-gray-900 text-white p-3 rounded shadow-lg hidden z-50">
+                <form method="get" action="{% url 'restaurants:restaurant_list' %}">
+                    {% for value, label in diet_choices %}
+                    <label class="flex items-center gap-2 mb-1">
+                        <input type="checkbox" name="diet_type" value="{{ value }}" 
+                        {% if value|stringformat:"s" in selected_diet_types %}checked{% endif %}>
+                        {{ label }}
+                    </label>
+                    {% endfor %}
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-1 rounded font-semibold mt-2">
+                    Apply
+                    </button>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 
