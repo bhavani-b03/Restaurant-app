@@ -32,16 +32,16 @@ class RestaurantListView(ListView):
             return qs.filter(cost_for_two__gte=int(start), cost_for_two__lte=int(end))
         return qs    
     
-    def apply_filters(self, qs):
-        qs = self.filter_price(qs)
-        qs = self.filter_diet_type(qs)
-        return qs
-
     def filter_diet_type(self, qs):
         diet_types = self.request.GET.getlist("diet_type")
         if diet_types:
             diet_types_int = [int(dt) for dt in diet_types if dt.isdigit()]
             return qs.filter(diet_type__in=diet_types_int)
+        return qs
+    
+    def apply_filters(self, qs):
+        qs = self.filter_price(qs)
+        qs = self.filter_diet_type(qs)
         return qs
     
     def get_queryset(self):
