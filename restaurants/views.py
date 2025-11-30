@@ -24,6 +24,7 @@ class RestaurantListView(ListView):
         context['diet_choices'] = [(value, diet_map[value]) for value, _ in DietType.choices]
         context['cuisines'] = Cuisine.objects.all()
         context['selected_cuisines'] = self.request.GET.getlist("cuisine")
+        context['rating_choices'] = [5, 4, 3, 2, 1]
         return context
     
     def filter_price(self, qs):
@@ -48,10 +49,20 @@ class RestaurantListView(ListView):
             return qs.filter(cuisines__id__in=cuisine_ids_int).distinct()
         return qs
     
+    def filter_rating(self, qs):
+        rating_values = self.request.GET.getlist("rating")
+
+        if rating_values:
+            numbers = [int(r) for r in rating_values if r.isdigit()]
+            return qs.filter(average_rating__in=numbers)
+
+        return qs
+    
     def apply_filters(self, qs):
         qs = self.filter_price(qs)
         qs = self.filter_diet_type(qs)
         qs = self.filter_cuisine(qs)
+        qs = self.filter_rating(qs)
         return qs
     
     def get_queryset(self):
