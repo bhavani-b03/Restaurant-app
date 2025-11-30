@@ -56,6 +56,19 @@ class TestRestaurantListView(RestaurantMixin):
         for r in excluded:
             self.assertNotContains(response, r.name)
 
+    def test_cuisine_filter_should_include_selected_cuisines(self):
+        response = self.client.get(reverse("restaurants:restaurant_list") + "?cuisine=1")
+        included = [r for r in self.restaurants if r.cuisines.filter(id=1).exists()]
+        for r in included:
+            self.assertContains(response, r.name)
+
+    def test_cuisine_filter_should_exclude_unselected_cuisines(self):
+        response = self.client.get(reverse("restaurants:restaurant_list") + "?cuisine=1")
+        excluded = [r for r in self.restaurants if not r.cuisines.filter(id=1).exists()]
+        for r in excluded:
+            self.assertNotContains(response, r.name)
+
+
 
 class TestRestaurantDetailView(RestaurantMixin):
     def test_detail_page_should_display_correct_restaurant(self):
