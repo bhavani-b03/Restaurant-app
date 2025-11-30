@@ -61,12 +61,12 @@ class Restaurant(TimeStampedModel):
         rating_counts = self.reviews.values('rating').annotate(count=Count('rating'))
 
         rating_data = {str(i): 0 for i in range(1, 6)}
-        for r in rating_counts:
-            rating_data[str(r['rating'])] = r['count']
+        for item in rating_counts:
+            rating_data[str(item['rating'])] = item['count']
 
-        total = sum(rating_data.values()) or 1  # avoid divide by zero
+        total_reviews = sum(rating_data.values()) or 1  # avoid divide by zero
         rating_percentage = {
-            star: round((count / total) * 100)
+            star: round((count / total_reviews) * 100)
             for star, count in rating_data.items()
         }
 
