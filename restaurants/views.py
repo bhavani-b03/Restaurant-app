@@ -5,33 +5,23 @@ from django.db.models import Count, Avg
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .forms import ReviewForm
 from django.urls import reverse
+from django_filters.views import FilterView
+from .filters import RestaurantFilter
 # Create your views here.
 DEFAULT_MIN_PRICE = 0
 DEFAULT_MAX_PRICE = 100000
 
-class RestaurantListView(ListView):
+class RestaurantListView(FilterView):
     model = Restaurant
     template_name = "restaurants/list.html"  
     context_object_name = "restaurants"  
     paginate_by = 10  
-
+    filterset_class = RestaurantFilter
     ordering = ['-average_rating']
-    
-    def filter_price(self, qs):
-        start = self.request.GET.get("start")
-        end = self.request.GET.get("end")
-
-        if start and end:
-            return qs.filter(cost_for_two__gte=int(start), cost_for_two__lte=int(end))
-        return qs    
-    
-    def apply_filters(self, qs):
-        qs = self.filter_price(qs)
-        return qs
 
     def get_queryset(self):
         qs = super().get_queryset().prefetch_related('images').with_user_bookmarks(self.request.user).with_user_visited(self.request.user)
-        return self.apply_filters(qs)
+        return qs
 
 class RestaurantDetailView(DetailView):
     model = Restaurant
