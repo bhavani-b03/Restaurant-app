@@ -46,6 +46,26 @@
                 </form>
             </div>
         </div>
+
+        <div class="relative">
+            <button id="cuisineBtn" class="w-full text-left bg-gray-700 hover:bg-gray-600 text-white px-2 py-1 rounded mb-2 relative">
+                Cuisines
+            </button>
+
+            <div id="cuisineDropdown" class="absolute right-full top-0 mr-2 w-48 max-h-60 bg-gray-900 text-white p-3 rounded shadow-lg hidden z-50 overflow-y-auto">
+                <form method="get" action="{% url 'restaurants:restaurant_list' %}">
+                    {% for cuisine in cuisines %}
+                    <label class="flex items-center gap-2 mb-1">
+                        <input type="checkbox" name="cuisines" value="{{ cuisine.id }}"
+                        {% if cuisine.id|stringformat:"s" in selected_cuisines %}checked{% endif %}>
+                        {{ cuisine.name }}
+                    </label>
+                    {% endfor %}
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-1 rounded font-semibold mt-2">
+                        Apply
+                    </button>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
-
