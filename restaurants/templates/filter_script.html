@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const dietBtn = document.getElementById("dietBtn");
     const dietDropdown = document.getElementById("dietDropdown");
 
-    if (!filterBtn || !priceDropdown || !applyPriceBtn || !grid) return; // safety check
+    if (!filterBtn || !priceDropdown || !applyPriceBtn || !grid || !dietBtn || !dietDropdown) return; // safety check
 
     // Toggle popup
     filterBtn.addEventListener("click", () => {
