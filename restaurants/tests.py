@@ -20,7 +20,7 @@ class TestRestaurantListView(RestaurantTestSetupMixin, TestCase):
 
     def test_price_filter_should_include_restaurants_within_range(self):
         response = self.client.get(
-            reverse("restaurants:restaurant_list") + "?start=100&end=300"
+            reverse("restaurants:restaurant_list") + "?cost_for_two_min=100&cost_for_two_max=300"
         )
         included = [r for r in self.restaurants if 100 <= r.cost_for_two <= 300]
         for r in included:
@@ -28,7 +28,7 @@ class TestRestaurantListView(RestaurantTestSetupMixin, TestCase):
 
     def test_price_filter_should_exclude_restaurants_outside_range(self):
         response = self.client.get(
-            reverse("restaurants:restaurant_list") + "?start=100&end=300"
+            reverse("restaurants:restaurant_list") + "?cost_for_two_min=100&cost_for_two_max=300"
         )
         excluded = [r for r in self.restaurants if r.cost_for_two < 100 or r.cost_for_two > 300]
         for r in excluded:
