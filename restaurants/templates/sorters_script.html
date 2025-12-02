@@ -1,29 +1,38 @@
 <script>
-const sortBtn = document.getElementById("sortBtn");
-const sortDropdown = document.getElementById("sortDropdown");
-const sortPriceBtn = document.getElementById("sortPriceBtn");
-const sortPriceDropdown = document.getElementById("sortPriceDropdown");
+const mainBtn = document.getElementById("sortBtn");
+const mainMenu = document.getElementById("sortDropdown");
+const toggleButtons = document.querySelectorAll("[data-toggle]");
+const dropdowns = document.querySelectorAll("[data-dropdown]");
 
-sortBtn.addEventListener("click", (e) => {
-    e.stopPropagation(); 
-    sortDropdown.classList.toggle("hidden");
-    sortPriceDropdown.classList.add("hidden");
+mainBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    mainMenu.classList.toggle("hidden");
+
+    if (mainMenu.classList.contains("hidden")) {
+        dropdowns.forEach(d => d.classList.add("hidden"));
+    }
 });
 
-sortPriceBtn.addEventListener("click", (e) => {
-    e.stopPropagation(); 
-    sortPriceDropdown.classList.toggle("hidden");
+toggleButtons.forEach(button => {
+    button.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const target = button.dataset.toggle;
+
+        dropdowns.forEach(drop => {
+            if (drop.dataset.dropdown === target) {
+                drop.classList.toggle("hidden");
+            } else {
+                drop.classList.add("hidden");
+            }
+        });
+    });
 });
 
 document.addEventListener("click", () => {
-    sortDropdown.classList.add("hidden");
-    sortPriceDropdown.classList.add("hidden");
+    mainMenu.classList.add("hidden");
+    dropdowns.forEach(d => d.classList.add("hidden"));
 });
 
-sortDropdown.addEventListener("click", (e) => {
-    e.stopPropagation();
-});
-sortPriceDropdown.addEventListener("click", (e) => {
-    e.stopPropagation();
-});
+mainMenu.addEventListener("click", (e) => e.stopPropagation());
+dropdowns.forEach(d => d.addEventListener("click", (e) => e.stopPropagation()));
 </script>

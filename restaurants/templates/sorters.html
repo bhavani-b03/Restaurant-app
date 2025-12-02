@@ -4,34 +4,6 @@
     </button>
 
     <div id="sortDropdown" class="absolute right-0 w-40 bg-gray-800 text-white rounded shadow-lg hidden z-50">
-
-        <!-- Price Sorting -->
-        <div class="relative">
-            <button id="sortPriceBtn" class="w-full text-left bg-gray-700 hover:bg-gray-600 text-white px-2 py-1 rounded mb-2">
-                Price
-            </button>
-
-            <div id="sortPriceDropdown" class="absolute right-full top-0 mr-2 w-40 bg-gray-900 text-white p-3 rounded shadow-lg hidden z-50">
-                <form method="get" action="{% url 'restaurants:restaurant_list' %}">
-
-                    <label class="flex items-center gap-2 mb-2 cursor-pointer">
-                        <input type="radio" name="sort_by" value="price_low"
-                        {% if selected_sort == "price_low" %}checked{% endif %}>
-                        Low → High
-                    </label>
-
-                    <label class="flex items-center gap-2 mb-2 cursor-pointer">
-                        <input type="radio" name="sort_by" value="price_high"
-                        {% if selected_sort == "price_high" %}checked{% endif %}>
-                        High → Low
-                    </label>
-
-                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-1 rounded font-semibold mt-2">
-                        Apply
-                    </button>
-                </form>
-            </div>
-        </div>
-
+        {% include "sort_dropdown_option.html" with button_id="sortPriceBtn" dropdown_id="sortPriceDropdown" title="Price" options=price_options %}
     </div>
 </div>
