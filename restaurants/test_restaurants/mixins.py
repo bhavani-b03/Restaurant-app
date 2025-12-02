@@ -38,12 +38,3 @@ class RestaurantTestSetupMixin(AuthMixin):
         self.restaurant = RestaurantFactory(cuisines=[self.cuisine])
 
         self.food = FoodFactory(restaurant=self.restaurant, cuisines=[self.cuisine])
-
-
-class FullInteractionMixin(RestaurantTestSetupMixin):
-    def setUp(self):
-        super().setUp()
-
-        self.review = ReviewFactory(user=self.user, restaurant=self.restaurant)
-        self.bookmark = BookmarkFactory(user=self.user, restaurant=self.restaurant)
-        self.visited = VisitedFactory(user=self.user, restaurant=self.restaurant)
