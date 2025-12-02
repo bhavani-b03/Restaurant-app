@@ -123,7 +123,7 @@ class TestRestaurantListView(RestaurantTestSetupMixin, TestCase):
     def test_filter_returns_only_spotlight_restaurants_using_filterset(self):
         filtered_queryset = RestaurantFilter(
             data={"is_spotlight": "true"},
-            queryset=self.restaurant.__class__.objects.all()
+            queryset=Restaurant.objects.all()
         ).qs
 
         result_names = list(filtered_queryset.values_list("name", flat=True))
