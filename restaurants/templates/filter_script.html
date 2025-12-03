@@ -1,0 +1,23 @@
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const filterBtn = document.getElementById("filterBtn");
+    const filterDropdown = document.getElementById("filterDropdown");
+    const priceBtn = document.getElementById("priceBtn");
+    const priceDropdown = document.getElementById("priceDropdown");
+    const applyPriceBtn = document.getElementById("applyPriceBtn");
+    const minPriceInput = document.getElementById("startPrice");
+    const maxPriceInput = document.getElementById("endPrice");
+    const grid = document.querySelector(".grid");
+
+    if (!filterBtn || !priceDropdown || !applyPriceBtn || !grid) return; // safety check
+
+    // Toggle popup
+    filterBtn.addEventListener("click", () => {
+        filterDropdown.classList.toggle("hidden");
+    });
+
+    priceBtn.addEventListener("click", () => {
+        priceDropdown.classList.toggle("hidden");
+    });
+});
+</script>

@@ -1,0 +1,31 @@
+<div class="relative inline-block">
+    <button id="filterBtn" class="text-gray-300 hover:text-yellow-400">
+        <i class="bi bi-funnel-fill text-xl"></i>
+    </button>
+
+    <div id="filterDropdown" class="absolute right-0 mr-0 w-40 bg-gray-800 text-white rounded shadow-lg hidden z-50">
+        <!-- Price option inside dropdown -->
+        <div class="relative">
+            <button id="priceBtn" class="w-full text-left bg-gray-700 hover:bg-gray-600 text-white px-2 py-1 rounded mb-2 relative">
+                Price
+            </button>
+
+            <div id="priceDropdown" class="absolute right-full top-0 mr-2 w-40 bg-gray-900 text-white p-3 rounded shadow-lg hidden z-50">
+                <form method="get" action="{% url 'restaurants:restaurant_list' %}">
+                <label class="block text-sm mb-1">Starting Price</label>
+                <input type="number" name="cost_for_two_min" min="0" class="w-full mb-2 px-2 py-1 rounded text-black">
+                
+                <label class="block text-sm mb-1">Ending Price</label>
+                <input type="number" name="cost_for_two_max" min="0" class="w-full mb-2 px-2 py-1 rounded text-black">
+                
+                <button type="submit" id="applyPriceBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-1 rounded font-semibold">
+                    Go
+                </button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+

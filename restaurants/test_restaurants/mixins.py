@@ -38,3 +38,15 @@ class RestaurantTestSetupMixin(AuthMixin):
         self.restaurant = RestaurantFactory(cuisines=[self.cuisine])
 
         self.food = FoodFactory(restaurant=self.restaurant, cuisines=[self.cuisine])
+
+        self.cuisines = [CuisineFactory(name="Italian"), CuisineFactory(name="Chinese")]
+        
+        self.restaurants = []
+
+        for i in range(5):  
+            assigned_cuisines = self.cuisines[:i % 2 + 1]  # simple pattern for example
+            restaurant = RestaurantFactory(cuisines=assigned_cuisines)
+            self.restaurants.append(restaurant)
+
+            FoodFactory(restaurant=restaurant, cuisines=assigned_cuisines)
+

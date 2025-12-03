@@ -5,14 +5,15 @@ from django.db.models import Count, Avg
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .forms import ReviewForm
 from django.urls import reverse
+from django_filters.views import FilterView
+from .filters import RestaurantFilter
 # Create your views here.
-
-class RestaurantListView(ListView):
+class RestaurantListView(FilterView):
     model = Restaurant
     template_name = "restaurants/list.html"  
     context_object_name = "restaurants"  
     paginate_by = 10  
-
+    filterset_class = RestaurantFilter
     ordering = ['-average_rating']
 
     def get_queryset(self):
