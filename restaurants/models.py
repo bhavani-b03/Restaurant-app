@@ -20,8 +20,8 @@ class Cuisine(models.Model):
 
 
 class DietType(models.IntegerChoices):
-    VEG = 1, 'Vegetarian'
-    NON_VEG = 2, 'Non-Vegetarian'
+    VEG = 1, 'Veg'
+    NON_VEG = 2, 'Non-Veg'
     VEGAN = 3, 'Vegan'
 
 
