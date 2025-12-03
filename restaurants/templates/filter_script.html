@@ -10,8 +10,10 @@ document.addEventListener("DOMContentLoaded", function() {
     const grid = document.querySelector(".grid");
     const dietBtn = document.getElementById("dietBtn");
     const dietDropdown = document.getElementById("dietDropdown");
+    const cuisineBtn = document.getElementById("cuisineBtn");
+    const cuisineDropdown = document.getElementById("cuisineDropdown");
 
-    if (!filterBtn || !priceDropdown || !applyPriceBtn || !grid || !dietBtn || !dietDropdown) return; // safety check
+    if (!filterBtn || !priceDropdown || !applyPriceBtn || !grid || !dietBtn || !dietDropdown || !cuisineBtn || !cuisineDropdown) return; // safety check
 
     // Toggle popup
     filterBtn.addEventListener("click", () => {
@@ -25,6 +27,17 @@ document.addEventListener("DOMContentLoaded", function() {
     dietBtn.addEventListener("click", (e) => {
         e.preventDefault();
         dietDropdown.classList.toggle("hidden");
+    });
+
+    cuisineBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        cuisineDropdown.classList.toggle("hidden");
+    });
+
+    document.addEventListener("click", (e) => {
+        if (!cuisineDropdown.contains(e.target) && !cuisineBtn.contains(e.target)) {
+            cuisineDropdown.classList.add("hidden");
+        }
     });
 });
 </script>
