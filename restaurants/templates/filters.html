@@ -33,7 +33,7 @@
 
             <div id="dietDropdown" class="absolute right-full top-0 mr-2 w-40 bg-gray-900 text-white p-3 rounded shadow-lg hidden z-50">
                 <form method="get" action="{% url 'restaurants:restaurant_list' %}">
-                    {% for value, label in diet_choices %}
+                    {% for value, label in filter.form.fields.diet_type.choices %}
                     <label class="flex items-center gap-2 mb-1">
                         <input type="checkbox" name="diet_type" value="{{ value }}" 
                         {% if value|stringformat:"s" in selected_diet_types %}checked{% endif %}>
