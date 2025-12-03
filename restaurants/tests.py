@@ -1,7 +1,8 @@
 from django.urls import reverse
 from django.test import TestCase
-from .models import Bookmark, Visited
+from .models import Bookmark, Visited, Review
 from restaurants.test_restaurants.mixins import RestaurantTestSetupMixin
+from django.contrib.auth.models import User
 
 class TestRestaurantListView(RestaurantTestSetupMixin, TestCase):
     def test_list_page_should_load_restaurants(self):
@@ -84,3 +85,50 @@ class TestToggleVisited(RestaurantTestSetupMixin, TestCase):
             Visited.objects.filter(user=self.user, restaurant=self.restaurant).exists()
         )
         self.assertJSONEqual(response.content, {"visited": False})
+
+class TestAddReviewView(RestaurantTestSetupMixin):
+    def test_should_create_new_review_if_none_exists(self):
+        url = reverse("restaurants:add_review", kwargs={"restaurant_id": self.restaurant.id})
+        response = self.client.post(url, {"rating": 5, "comment": "Amazing food!", "restaurant_id": self.restaurant.id})
+        self.assertEqual(response.status_code, 302)
+        review = Review.objects.get(user=self.user, restaurant=self.restaurant)
+        self.assertEqual(review.rating, 5)
+        self.assertEqual(review.comment, "Amazing food!")
+
+    def test_should_update_existing_review(self):
+        Review.objects.create(user=self.user, restaurant=self.restaurant, rating=3, comment="Good")
+        url = reverse("restaurants:add_review", kwargs={"restaurant_id": self.restaurant.id})
+        self.client.post(url, {"rating": 4, "comment": "Better now", "restaurant_id": self.restaurant.id})
+        review = Review.objects.get(user=self.user, restaurant=self.restaurant)
+        self.assertEqual(review.rating, 4)
+        self.assertEqual(review.comment, "Better now")
+
+
+    def test_should_require_login(self):
+        self.client.logout()
+        url = reverse("restaurants:add_review", kwargs={"restaurant_id": self.restaurant.id})
+        response = self.client.post(url, {"rating": 5, "comment": "Test"})
+        self.assertRedirects(response, f"/accounts/login/?next={url}")
+
+class TestDeleteReviewView(RestaurantTestSetupMixin):
+    def test_user_can_delete_own_review(self):
+        review = Review.objects.create(user=self.user, restaurant=self.restaurant, rating=4, comment="Nice")
+        url = reverse("restaurants:delete_review", kwargs={"pk": review.id})
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(Review.objects.filter(id=review.id).exists())
+
+    def test_should_require_login(self):
+        review = Review.objects.create(user=self.user, restaurant=self.restaurant, rating=4, comment="Nice")
+        self.client.logout()
+        url = reverse("restaurants:delete_review", kwargs={"pk": review.id})
+        response = self.client.post(url)
+        self.assertRedirects(response, f"/accounts/login/?next={url}")
+
+    def test_user_should_not_delete_others_review(self):
+        other_user = User.objects.create_user(username="other", password="pass123")
+        review_by_other = Review.objects.create(user=other_user, restaurant=self.restaurant, rating=5, comment="Great!")
+        url = reverse("restaurants:delete_review", kwargs={"pk": review_by_other.id})
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 403)
+        self.assertTrue(Review.objects.filter(id=review_by_other.id).exists())

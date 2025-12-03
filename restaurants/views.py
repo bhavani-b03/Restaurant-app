@@ -1,7 +1,10 @@
-from django.shortcuts import render, get_object_or_404
-from .models import Restaurant, Food, Cuisine, Bookmark, Visited
-from django.views.generic import ListView, DetailView
-
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import Restaurant, Food, Cuisine, Bookmark, Visited, Review
+from django.views.generic import ListView, DetailView, CreateView, DeleteView, UpdateView
+from django.db.models import Count, Avg
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from .forms import ReviewForm
+from django.urls import reverse
 # Create your views here.
 
 class RestaurantListView(ListView):
@@ -22,8 +25,15 @@ class RestaurantDetailView(DetailView):
     context_object_name = "restaurant"
 
     def get_queryset(self):
-        return super().get_queryset().prefetch_related('images', 'cuisines').with_user_visited(self.request.user)
+        return super().get_queryset().prefetch_related('images', 'cuisines', 'reviews__user').with_user_visited(self.request.user)
     
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["reviews"] = self.object.reviews.select_related('user').all()
+        context["rating_stats"] = self.object.get_rating_stats()
+        return context
+
+
 class FoodListView(ListView):
     model = Food
     template_name = "foods/list.html"
@@ -83,3 +93,42 @@ def toggle_visited(request):
 
     return JsonResponse({"visited": True})
 
+class AddReviewView(LoginRequiredMixin, UpdateView):  
+    model = Review
+    template_name = "restaurants/detail.html"
+    form_class = ReviewForm
+
+    def get_object(self, queryset=None):
+        self.restaurant = get_object_or_404(Restaurant, id=self.kwargs["restaurant_id"])
+        review, created = Review.objects.get_or_create(
+            user=self.request.user,
+            restaurant=self.restaurant,
+            defaults={"rating": 0, "comment": ""}
+        )
+        return review
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["restaurant"] = self.restaurant
+        return context
+
+    def form_valid(self, form):
+        review = form.save()
+        review.restaurant.update_average_rating()
+        return redirect("restaurants:restaurant_detail", pk=self.restaurant.id)
+
+class DeleteReviewView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Review
+
+    def test_func(self):
+        return self.get_object().user == self.request.user
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        restaurant = self.object.restaurant  # save restaurant before deletion
+        response = super().delete(request, *args, **kwargs)
+        restaurant.update_average_rating()  # update after deletion
+        return response
+
+    def get_success_url(self):
+        return reverse('restaurants:restaurant_detail', kwargs={'pk': self.object.restaurant.id})

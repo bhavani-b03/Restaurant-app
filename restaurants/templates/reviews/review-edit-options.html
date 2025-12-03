@@ -1,0 +1,19 @@
+<div class="absolute top-0 right-0">
+    <div class="dropdown">
+        <button class="bi bi-three-dots-vertical text-gray-400 cursor-pointer" 
+                id="reviewDropdown{{ review.id }}" data-bs-toggle="dropdown" aria-expanded="false"></button>
+        <ul class="dropdown-menu dropdown-menu-end bg-gray-900 text-white border border-gray-700 rounded mt-2"
+            aria-labelledby="reviewDropdown{{ review.id }}">
+        <li>
+            <button class="open-review dropdown-item edit-review-btn text-white hover:!text-black active:!text-white" data-review-id="{{ review.id }}">
+            Edit 
+            </button>
+        </li>
+        <li>
+            <button type="submit" class="delete-btn dropdown-item text-white hover:!text-black">
+            Delete
+            </button>
+        </li>
+        </ul>
+    </div>
+</div>
