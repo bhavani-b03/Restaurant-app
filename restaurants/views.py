@@ -19,6 +19,7 @@ class RestaurantListView(FilterView):
     def get_queryset(self):
         qs = super().get_queryset().prefetch_related('images').with_user_bookmarks(self.request.user).with_user_visited(self.request.user)
         return qs
+    
 class RestaurantDetailView(DetailView):
     model = Restaurant
     template_name = "restaurants/detail.html"  
