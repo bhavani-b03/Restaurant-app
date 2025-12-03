@@ -1,7 +1,7 @@
 from django.urls import reverse
 from django.test import TestCase
 from .models import Bookmark, Visited, Review
-from restaurants.test_restaurants.mixins import RestaurantTestSetupMixin, FullInteractionMixin
+from restaurants.test_restaurants.mixins import RestaurantTestSetupMixin
 from django.contrib.auth.models import User
 
 class TestRestaurantListView(RestaurantTestSetupMixin, TestCase):
@@ -125,7 +125,7 @@ class TestDeleteReviewView(RestaurantTestSetupMixin):
         response = self.client.post(url)
         self.assertRedirects(response, f"/accounts/login/?next={url}")
 
-    def test_user_cannot_delete_others_review(self):
+    def test_user_should_not_delete_others_review(self):
         other_user = User.objects.create_user(username="other", password="pass123")
         review_by_other = Review.objects.create(user=other_user, restaurant=self.restaurant, rating=5, comment="Great!")
         url = reverse("restaurants:delete_review", kwargs={"pk": review_by_other.id})

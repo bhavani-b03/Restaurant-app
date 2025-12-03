@@ -1,0 +1,45 @@
+<!-- Reviews List -->
+<div class="mt-8 space-y-4">
+    {% for review in reviews %}
+        <div class="review-card flex items-start gap-3" data-review-id="{{ review.id }}">
+
+            <!-- Profile -->
+            <img 
+                src="https://api.dicebear.com/7.x/personas/svg?seed={{ review.user.username }}"
+                class="w-10 h-10 rounded-full bg-gray-700 p-1 object-cover"
+                alt="profile"
+            >
+
+            <!-- Comment Content -->
+            <div class="flex-1 relative">
+
+                <!-- Username + Time inline -->
+                <p class="text-[11px] font-semibold text-gray-300 flex items-center gap-1">
+                    {{ review.user.username }}
+                    <span class="text-[9px] font-normal text-gray-500">
+                        • {{ review.created_at|date:"M d, Y" }}
+                    </span>
+                </p>
+
+                <!-- Rating -->
+                <div class="flex items-center gap-1 text-yellow-400 text-xs mb-1">
+                    <span>{{ review.rating }}</span>
+                    <i class="bi bi-star-fill text-[10px]"></i>
+                </div>
+
+                <!-- Comment Text -->
+                <p class="review-comment text-gray-300 text-xs leading-snug">
+                    {{ review.comment }}
+                </p>
+
+                {% if review.user == request.user %}
+                    {% include "reviews/review-edit-options.html" %}
+                {% endif %}
+            </div>
+
+            {% include "reviews/delete-review-confirm.html" %}
+        </div>
+    {% empty %}
+        <p class="text-gray-500 text-sm">No reviews yet.</p>
+    {% endfor %}
+</div>

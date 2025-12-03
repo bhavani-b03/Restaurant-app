@@ -1,0 +1,50 @@
+<div class="mt-10 text-white">
+
+  <!-- Header -->
+  <h2 class="text-2xl font-bold mb-4">Ratings & Reviews</h2>
+
+  <!-- Rating Summary like Play Store -->
+  <div class="flex gap-6 items-center">
+
+    <!-- Average Rating -->
+    <div class="text-center">
+      <div class="text-5xl font-extrabold text-white" id="avg-rating">
+        {{ restaurant.average_rating }}
+      </div>
+      <div class="flex justify-center mt-1 text-yellow-400 text-xl">
+        <i class="bi bi-star-fill"></i>
+      </div>
+      <p class="text-gray-400 text-xs mt-1">
+        Based on <span id="review-count">{{ restaurant.reviews.count }}</span> reviews
+      </p>
+    </div>
+
+    <!-- Breakdown Bars -->
+    <div class="flex flex-col gap-2 text-sm mt-4">
+      {% for item in rating_stats %}
+        <div class="flex items-center gap-2">
+          <span class="text-white font-medium">{{ item.star }}⭐</span>
+
+          <div class="w-40 h-2 bg-white rounded-full overflow-hidden">
+            <div class="h-2 bg-yellow-400"
+                style="width: calc({{ item.percentage }}%)">
+            </div>
+          </div>
+
+          <span class="text-gray-300 text-xs">({{ item.count }})</span>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Write Review Button -->
+  <button 
+    class="open-review mt-6 px-4 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white font-semibold"
+    id="writeReviewBtn">
+    Write a Review
+  </button>
+
+  {% include "reviews/review-form.html" %}
+  {% include "reviews/review-list.html" %}
+  
+</div>
