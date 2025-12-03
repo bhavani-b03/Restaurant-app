@@ -8,9 +8,6 @@ from django.urls import reverse
 from django_filters.views import FilterView
 from .filters import RestaurantFilter
 # Create your views here.
-DEFAULT_MIN_PRICE = 0
-DEFAULT_MAX_PRICE = 100000
-
 class RestaurantListView(FilterView):
     model = Restaurant
     template_name = "restaurants/list.html"  
