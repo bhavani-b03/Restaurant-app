@@ -105,7 +105,6 @@ class TestRestaurantListView(RestaurantTestSetupMixin, TestCase):
         assert prices == sorted(prices, reverse=True)
 
     def test_restaurants_should_sort_by_rating_high_to_low(self):
-        self.login()
         url = reverse("restaurants:restaurant_list") + "?sort_by=rating_high"
         response = self.client.get(url)
         qs = response.context['restaurants']
@@ -114,7 +113,6 @@ class TestRestaurantListView(RestaurantTestSetupMixin, TestCase):
         assert ratings == sorted(ratings, reverse=True)
 
     def test_restaurants_should_sort_by_rating_low_to_high(self):
-        self.login()
         url = reverse("restaurants:restaurant_list") + "?sort_by=rating_low"
         response = self.client.get(url)
         qs = response.context['restaurants']

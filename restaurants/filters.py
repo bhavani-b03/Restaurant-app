@@ -57,4 +57,4 @@ class RestaurantFilter(django_filters.FilterSet):
         if value == "rating_low":
             return queryset.order_by("average_rating")
         return queryset
-    
+
