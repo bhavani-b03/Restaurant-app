@@ -5,7 +5,20 @@
 
     <div data-dropdown="{{ dropdown_id }}" id="{{ dropdown_id }}" class="absolute right-full top-0 mr-2 w-40 bg-gray-900 text-white p-3 rounded shadow-lg hidden z-50">
         <form method="get" action="{% url 'restaurants:restaurant_list' %}">
+            
+            {% if field_name == "sort_by_rating" %}
+                {% for value, label in filter.form.sort_by_rating.field.choices %}
+                    <label class="flex items-center gap-2 mb-2 cursor-pointer">
+                        <input 
+                            type="radio" 
+                            name="sort_by_rating"
+                            value="{{ value }}"
+                            {% if request.GET.sort_by_rating == value %}checked{% endif %}>
+                        {{ label }}
+                    </label>
+                {% endfor %}
 
+            {% else %}
             {% for value, label in filter.form.sort_by.field.choices %}
             <label class="flex items-center gap-2 mb-2 cursor-pointer">
                 <input 
@@ -16,6 +29,7 @@
                 {{ label }}
             </label>
             {% endfor %}
+            {% endif %}
 
             <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-1 rounded font-semibold mt-2">
                 Apply

@@ -31,6 +31,15 @@ class RestaurantFilter(django_filters.FilterSet):
         empty_label=None
     )
 
+    sort_by_rating = django_filters.ChoiceFilter(
+        method="sort_by_ratings",
+        choices=[
+            ('rating_high', 'High → Low'),
+            ('rating_low', 'Low → High'),
+        ],
+        empty_label=None
+    )
+
     class Meta:
         model = Restaurant
         fields = ['cost_for_two_min', 'cost_for_two_max', 'diet_type', 'cuisines', 'rating']
@@ -41,3 +50,11 @@ class RestaurantFilter(django_filters.FilterSet):
         if value == "price_high":
             return queryset.order_by("-cost_for_two")
         return queryset
+
+    def sort_by_ratings(self, queryset, name, value):
+        if value == "rating_high":
+            return queryset.order_by("-average_rating")
+        if value == "rating_low":
+            return queryset.order_by("average_rating")
+        return queryset
+

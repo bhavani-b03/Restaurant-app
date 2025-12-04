@@ -104,6 +104,23 @@ class TestRestaurantListView(RestaurantTestSetupMixin, TestCase):
 
         assert prices == sorted(prices, reverse=True)
 
+    def test_restaurants_should_sort_by_rating_high_to_low(self):
+        url = reverse("restaurants:restaurant_list") + "?sort_by=rating_high"
+        response = self.client.get(url)
+        qs = response.context['restaurants']
+
+        ratings = list(qs.values_list("average_rating", flat=True))
+        assert ratings == sorted(ratings, reverse=True)
+
+    def test_restaurants_should_sort_by_rating_low_to_high(self):
+        url = reverse("restaurants:restaurant_list") + "?sort_by=rating_low"
+        response = self.client.get(url)
+        qs = response.context['restaurants']
+
+        ratings = list(qs.values_list("average_rating", flat=True))
+        assert ratings == sorted(ratings)
+
+
 class TestRestaurantDetailView(RestaurantTestSetupMixin, TestCase):
     def test_detail_page_should_display_correct_restaurant(self):
         url = reverse("restaurants:restaurant_detail", kwargs={"pk": self.restaurant.pk})
