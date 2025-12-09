@@ -46,5 +46,41 @@ document.addEventListener("DOMContentLoaded", function() {
         e.stopPropagation();
         ratingDropdown.classList.toggle("hidden");
     });
+
+    const dropdownButtons = ["price", "diet", "cuisine", "rating"];
+
+    const dropdowns = dropdownButtons.map(name => ({
+        btn: document.getElementById(`${name}Btn`),
+        menu: document.getElementById(`${name}Dropdown`)
+    }));
+
+    dropdowns.forEach(({ btn, menu }) => {
+        if (!btn || !menu) return;
+
+        btn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            dropdowns.forEach(({ menu: other }) => {
+                if (other !== menu) other.classList.add("hidden");
+            });
+        });
+    });
+
+    // Close main filter and all sub dropdowns when clicking outside
+    document.addEventListener("click", (e) => {
+        const clickedInsideMain = filterDropdown.contains(e.target) || filterBtn.contains(e.target);
+
+        // If clicked outside main filter dropdown
+        if (!clickedInsideMain) {
+            filterDropdown.classList.add("hidden");
+        }
+
+        // Close all sub dropdowns if click is outside them & their buttons
+        dropdowns.forEach(({ btn, menu }) => {
+            if (!menu.contains(e.target) && !btn.contains(e.target)) {
+                menu.classList.add("hidden");
+            }
+        });
+    });
+
 });
 </script>
