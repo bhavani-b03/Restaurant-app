@@ -1,0 +1,7 @@
+{% for key, values in request.GET.lists %}
+    {% if key != "page" %}
+        {% for value in values %}
+            <input type="hidden" name="{{ key }}" value="{{ value }}">
+        {% endfor %}
+    {% endif %}
+{% endfor %}
