@@ -12,6 +12,9 @@
 
             <div id="priceDropdown" class="absolute right-full top-0 mr-2 w-40 bg-gray-900 text-white p-3 rounded shadow-lg hidden z-50">
                 <form method="get" action="{% url 'restaurants:restaurant_list' %}">
+
+                {% include 'hidden_params.html' %}
+
                 <label class="block text-sm mb-1">Starting Price</label>
                 <input type="number" name="cost_for_two_min" min="0" class="w-full mb-2 px-2 py-1 rounded text-black">
                 
@@ -33,6 +36,9 @@
 
             <div id="dietDropdown" class="absolute right-full top-0 mr-2 w-40 bg-gray-900 text-white p-3 rounded shadow-lg hidden z-50">
                 <form method="get" action="{% url 'restaurants:restaurant_list' %}">
+
+                    {% include 'hidden_params.html' %}
+
                     {% for value, label in filter.form.fields.diet_type.choices %}
                     <label class="flex items-center gap-2 mb-1">
                         <input type="checkbox" name="diet_type" value="{{ value }}" 
@@ -54,6 +60,9 @@
 
             <div id="cuisineDropdown" class="absolute right-full top-0 mr-2 w-48 max-h-60 bg-gray-900 text-white p-3 rounded shadow-lg hidden z-50 overflow-y-auto">
                 <form method="get" action="{% url 'restaurants:restaurant_list' %}">
+
+                    {% include 'hidden_params.html' %}
+
                     {% for value, label in filter.form.fields.cuisines.choices %}
                     <label class="flex items-center gap-2 mb-1">
                         <input type="checkbox" name="cuisines" value="{{ value }}">
@@ -75,6 +84,8 @@
 
             <div id="ratingDropdown" class="absolute right-full top-0 mr-2 w-40 bg-gray-900 text-white p-3 rounded shadow-lg hidden z-50">
                 <form method="get" action="{% url 'restaurants:restaurant_list' %}">
+
+                    {% include 'hidden_params.html' %}
 
                     {% for value, label in filter.form.fields.rating.choices %}
                     <label class="flex items-center gap-2 mb-1">
