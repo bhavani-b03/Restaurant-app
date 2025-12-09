@@ -41,10 +41,12 @@ class RestaurantFilter(django_filters.FilterSet):
         ],
         empty_label=None
     )
+    
+    search = django_filters.CharFilter(field_name='name', lookup_expr='icontains', label='Search')
 
     class Meta:
         model = Restaurant
-        fields = ['cost_for_two_min', 'cost_for_two_max', 'diet_type', 'cuisines', 'rating', 'is_spotlight']
+        fields = ['cost_for_two_min', 'cost_for_two_max', 'diet_type', 'cuisines', 'rating', 'is_spotlight', 'search']
 
     def sort_by_price(self, queryset, name, value):
         if value == "price_low":

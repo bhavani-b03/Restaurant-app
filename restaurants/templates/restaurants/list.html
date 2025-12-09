@@ -5,6 +5,20 @@
 <div class="flex items-center justify-between mt-6 mb-4">
     <h1 class="text-3xl font-bold mt-6 mb-4 text-gray-100">Restaurants</h1>
 
+    <!-- Search Bar -->
+    <form method="get" class="relative w-full sm:w-48">
+        <i class="bi bi-search absolute left-3 top-2.5 text-gray-400"></i>
+
+        <input 
+            type="text" 
+            name="search"
+            value="{{ request.GET.search }}"
+            placeholder="Search restaurants ..."
+            class="w-full pl-9 pr-4 py-2 rounded-full bg-gray-800 text-gray-200 border border-gray-600 
+                  focus:outline-none focus:ring-2 focus:ring-yellow-400 text-sm placeholder-gray-400"
+        >
+    </form>
+
     <div class="flex items-center gap-4">
 
         {% if request.GET %}
