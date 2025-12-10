@@ -101,6 +101,16 @@
             </div>
         </div>
 
-        <a id="spotlight" href="{% url 'restaurants:restaurant_list' %}?is_spotlight=True" class="block w-full text-left bg-gray-700 hover:bg-gray-600 text-white px-2 py-1 rounded mb-2">Spotlight</a>
+        <form method="get" action="{% url 'restaurants:restaurant_list' %}">
+            {% include 'hidden_params.html' %}
+
+            <!-- Force spotlight to True -->
+            <input type="hidden" name="is_spotlight" value="True">
+
+            <button type="submit"
+                class="w-full text-left bg-gray-700 hover:bg-gray-600 text-white px-2 py-1 rounded mb-2">
+                Spotlight
+            </button>
+        </form>
     </div>
 </div>
