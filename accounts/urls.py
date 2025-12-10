@@ -13,7 +13,7 @@ urlpatterns = [
 
     path('logout/', 
         auth_views.LogoutView.as_view(
-            next_page=reverse_lazy('home')
+            next_page=reverse_lazy('restaurants:restaurant_list')
         ), 
         name='logout'
     ),
