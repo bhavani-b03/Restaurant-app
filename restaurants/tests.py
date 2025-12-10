@@ -137,7 +137,71 @@ class TestRestaurantListView(RestaurantTestSetupMixin, TestCase):
             expected_spotlight,
             msg=f"Expected spotlight restaurants {expected_spotlight}, but got {result_names}"
         )
+        
+    def test_search_should_return_matching_restaurants(self):
+        response = self.client.get(
+            reverse("restaurants:restaurant_list") + "?search=rest"
+        )
+        included = [r for r in self.restaurants if "rest" in r.name.lower()]
 
+        for r in included:
+            self.assertContains(response, r.name)
+            
+    def test_search_should_work_with_diet_type_filter(self):
+        url = reverse("restaurants:restaurant_list") + "?search=rest&diet_type=1"
+        response = self.client.get(url)
+
+        expected = [
+            r for r in self.restaurants
+            if "rest" in r.name.lower() and r.diet_type == 1
+        ]
+
+        unexpected = [
+            r for r in self.restaurants
+            if not ("rest" in r.name.lower() and r.diet_type == 1)
+        ]
+
+        for r in expected:
+            self.assertContains(response, r.name)
+
+        for r in unexpected:
+            self.assertNotContains(response, r.name)
+
+    def test_search_should_work_with_cuisine_filter(self):
+        url = reverse("restaurants:restaurant_list") + "?search=rest&cuisines=1"
+        response = self.client.get(url)
+
+        expected = [
+            r for r in self.restaurants
+            if "rest" in r.name.lower() and r.cuisines.filter(id=1).exists()
+        ]
+
+        for r in expected:
+            self.assertContains(response, r.name)
+            
+    def test_search_should_work_with_price_filter(self):
+        url = reverse("restaurants:restaurant_list") + "?search=rest&cost_for_two_min=100&cost_for_two_max=300"
+        response = self.client.get(url)
+
+        expected = [
+            r for r in self.restaurants
+            if "rest" in r.name.lower() and 100 <= r.cost_for_two <= 300
+        ]
+
+        for r in expected:
+            self.assertContains(response, r.name)
+            
+    def test_search_should_work_with_rating_filter(self):
+        url = reverse("restaurants:restaurant_list") + "?search=rest&rating=5"
+        response = self.client.get(url)
+
+        expected = [
+            r for r in self.restaurants
+            if "rest" in r.name.lower() and int(r.average_rating) == 5
+        ]
+
+        for r in expected:
+            self.assertContains(response, r.name)
 
 
 class TestRestaurantDetailView(RestaurantTestSetupMixin, TestCase):
