@@ -7,8 +7,9 @@ function toggleBookmark(event) {
 
     const btn = event.currentTarget;
     const restaurantId = btn.dataset.id;
+    const currentParams = window.location.search; 
 
-    fetch("{% url 'restaurants:toggle_bookmark' %}", {
+    fetch("{% url 'restaurants:toggle_bookmark' %}" + currentParams, {
         method: "POST",
         headers: {
             "X-CSRFToken": "{{ csrf_token }}",
