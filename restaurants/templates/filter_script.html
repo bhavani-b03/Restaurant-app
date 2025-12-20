@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const ratingDropdown = document.getElementById("ratingDropdown");
     const form = document.getElementById("filter-form");
 
-    if (!filterBtn || !priceDropdown || !grid || !dietBtn || !dietDropdown || !cuisineBtn || !cuisineDropdown) return; // safety check
+    if (!filterBtn || !priceDropdown || !grid || !dietBtn || !dietDropdown || !cuisineBtn || !cuisineDropdown || !form) return; // safety check
 
     // Toggle popup
     filterBtn.addEventListener("click", () => {
