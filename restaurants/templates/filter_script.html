@@ -4,7 +4,6 @@ document.addEventListener("DOMContentLoaded", function() {
     const filterDropdown = document.getElementById("filterDropdown");
     const priceBtn = document.getElementById("priceBtn");
     const priceDropdown = document.getElementById("priceDropdown");
-    const applyPriceBtn = document.getElementById("applyPriceBtn");
     const minPriceInput = document.getElementById("startPrice");
     const maxPriceInput = document.getElementById("endPrice");
     const grid = document.querySelector(".grid");
@@ -14,8 +13,9 @@ document.addEventListener("DOMContentLoaded", function() {
     const cuisineDropdown = document.getElementById("cuisineDropdown");
     const ratingBtn = document.getElementById("ratingBtn");
     const ratingDropdown = document.getElementById("ratingDropdown");
+    const form = document.getElementById("filter-form");
 
-    if (!filterBtn || !priceDropdown || !applyPriceBtn || !grid || !dietBtn || !dietDropdown || !cuisineBtn || !cuisineDropdown) return; // safety check
+    if (!filterBtn || !priceDropdown || !grid || !dietBtn || !dietDropdown || !cuisineBtn || !cuisineDropdown) return; // safety check
 
     // Toggle popup
     filterBtn.addEventListener("click", () => {
@@ -78,6 +78,14 @@ document.addEventListener("DOMContentLoaded", function() {
         dropdowns.forEach(({ btn, menu }) => {
             if (!menu.contains(e.target) && !btn.contains(e.target)) {
                 menu.classList.add("hidden");
+            }
+        });
+    });
+
+    form.addEventListener("submit", function () {
+        form.querySelectorAll("input").forEach(input => {
+            if (!input.value) {
+                input.disabled = true;
             }
         });
     });
