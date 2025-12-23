@@ -44,9 +44,11 @@ class RestaurantFilter(django_filters.FilterSet):
     
     search = django_filters.CharFilter(field_name='name', lookup_expr='icontains', label='Search')
 
+    bookmarked = django_filters.BooleanFilter(method="filter_bookmarked")
+
     class Meta:
         model = Restaurant
-        fields = ['cost_for_two_min', 'cost_for_two_max', 'diet_type', 'cuisines', 'rating', 'is_spotlight', 'search']
+        fields = ['cost_for_two_min', 'cost_for_two_max', 'diet_type', 'cuisines', 'rating', 'is_spotlight', 'search', 'bookmarked']
 
     def sort_by_price(self, queryset, name, value):
         if value == "price_low":
@@ -62,3 +64,7 @@ class RestaurantFilter(django_filters.FilterSet):
             return queryset.order_by("average_rating")
         return queryset
 
+    def filter_bookmarked(self, queryset, name, value):
+        if value and self.request.user.is_authenticated:
+            return queryset.filter(bookmarked_by__user=self.request.user)
+        return queryset

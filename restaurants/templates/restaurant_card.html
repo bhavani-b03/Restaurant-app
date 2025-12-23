@@ -10,13 +10,17 @@
   <div class="p-4">
     <div class="flex justify-between items-center">
     <h2 class="font-bold text-lg">{{ restaurant.name }}</h2>
-    <button class="bookmark-btn" data-id="{{ restaurant.id }}">
-      {% if restaurant.is_bookmarked %}
-        <i class="bi bi-bookmark-fill text-yellow-400 text-xl"></i>
-      {% else %}
-        <i class="bi bi-bookmark text-gray-300 text-xl"></i>
-      {% endif %}
-    </button>
+    <form method="post" action="{% url 'restaurants:toggle_bookmark' %}">
+        {% csrf_token %}
+        <input type="hidden" name="restaurant_id" value="{{ restaurant.id }}">
+        <button class="bookmark-btn" data-id="{{ restaurant.id }}">
+          {% if restaurant.is_bookmarked %}
+            <i class="bi bi-bookmark-fill text-yellow-400 text-xl"></i>
+          {% else %}
+            <i class="bi bi-bookmark text-gray-300 text-xl"></i>
+          {% endif %}
+        </button>
+    </form>
     </div>  
     <p class="text-gray-400 text-sm flex items-center gap-2 mt-1">
       {{ restaurant.city }} 
