@@ -46,9 +46,11 @@ class RestaurantFilter(django_filters.FilterSet):
 
     bookmarked = django_filters.BooleanFilter(method="filter_bookmarked")
 
+    visited = django_filters.BooleanFilter(method="filter_visited")
+
     class Meta:
         model = Restaurant
-        fields = ['cost_for_two_min', 'cost_for_two_max', 'diet_type', 'cuisines', 'rating', 'is_spotlight', 'search', 'bookmarked']
+        fields = ['cost_for_two_min', 'cost_for_two_max', 'diet_type', 'cuisines', 'rating', 'is_spotlight', 'search', 'bookmarked', 'visited']
 
     def sort_by_price(self, queryset, name, value):
         if value == "price_low":
