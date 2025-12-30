@@ -35,17 +35,7 @@
 
         {% include "filters.html" %}
 
-        {% if request.GET.visited %}
-          <a href="?{% for k,v in request.GET.items %}{% if k != 'visited' %}{{ k }}={{ v }}&{% endif %}{% endfor %}"
-            class="text-yellow-400">
-            <i class="bi bi-eye-fill text-xl"></i>
-          </a>
-        {% else %}
-          <a href="?{{ request.GET.urlencode }}&visited=true"
-            class="text-gray-300 hover:text-yellow-400">
-            <i class="bi bi-eye text-xl"></i>
-          </a>
-        {% endif %}
+        {% include "_filter_toggle.html" with param_name="visited" icon_on="bi-eye-fill" icon_off="bi-eye" %}
 
         {% if request.GET.bookmarked %}
           <a href="?{% for k,v in request.GET.items %}{% if k != 'bookmarked' %}{{ k }}={{ v }}&{% endif %}{% endfor %}"
