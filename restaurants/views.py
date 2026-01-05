@@ -61,7 +61,7 @@ def toggle_bookmark(request):
     try:
         restaurant = Restaurant.objects.get(id=restaurant_id)
     except (Restaurant.DoesNotExist, ValueError, TypeError):
-        return JsonResponse({"error": "Invalid restaurant ID"}, status=400)
+        return redirect(request.META.get("HTTP_REFERER", "restaurants:restaurant_list"))
 
     bookmark, created = Bookmark.objects.get_or_create(
         user=request.user,
@@ -70,9 +70,8 @@ def toggle_bookmark(request):
 
     if not created:
         bookmark.delete()
-        return JsonResponse({"bookmarked": False})
 
-    return JsonResponse({"bookmarked": True})
+    return redirect(request.META.get("HTTP_REFERER", "restaurants:restaurant_list"))
 
 @require_POST
 @login_required
