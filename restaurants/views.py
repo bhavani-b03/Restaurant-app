@@ -80,7 +80,7 @@ def toggle_visited(request):
     try:
         restaurant = Restaurant.objects.get(id=restaurant_id)
     except (TypeError, ValueError, Restaurant.DoesNotExist):
-        return JsonResponse({"error": "Invalid restaurant ID"}, status=400)
+        return redirect(request.META.get("HTTP_REFERER", "restaurants:restaurant_list"))
 
     visited, created = Visited.objects.get_or_create(
         user=request.user,
@@ -89,9 +89,8 @@ def toggle_visited(request):
 
     if not created:
         visited.delete()
-        return JsonResponse({"visited": False})
 
-    return JsonResponse({"visited": True})
+    return redirect(request.META.get("HTTP_REFERER", "restaurants:restaurant_list"))
 
 class AddReviewView(LoginRequiredMixin, UpdateView):  
     model = Review

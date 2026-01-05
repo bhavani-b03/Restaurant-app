@@ -35,9 +35,7 @@
 
         {% include "filters.html" %}
 
-        <button id="visitedFilterBtn" class="text-gray-300 hover:text-yellow-400">
-            <i class="bi bi-eye-fill text-xl"></i>
-        </button>
+        {% include "_filter_toggle.html" with param_name="visited" icon_on="bi-eye-fill" icon_off="bi-eye" %}
 
         {% if request.GET.bookmarked %}
           <a href="?{% for k,v in request.GET.items %}{% if k != 'bookmarked' %}{{ k }}={{ v }}&{% endif %}{% endfor %}"
@@ -65,7 +63,6 @@
 <div class="mt-6">
   {% include "pagination.html" %}
 </div>
-{% include "visited_script.html" %}
 {% include "filter_script.html" %}
 {% include "sorters_script.html" %}
 {% endblock %}
