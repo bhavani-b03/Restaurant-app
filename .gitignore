@@ -46,3 +46,4 @@ local_settings.py
 
 restaurant_images/
 
+data.json
