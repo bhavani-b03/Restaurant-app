@@ -1,4 +1,4 @@
-{% if request.GET[param_name] %}
+{% if param_name in request.GET %}
   <a href="?{% for k,v in request.GET.items %}{% if k != param_name %}{{ k }}={{ v }}&{% endif %}{% endfor %}"
      class="text-yellow-400">
     <i class="bi {{ icon_on }} text-xl"></i>
