@@ -1,0 +1,11 @@
+{% if request.GET[param_name] %}
+  <a href="?{% for k,v in request.GET.items %}{% if k != param_name %}{{ k }}={{ v }}&{% endif %}{% endfor %}"
+     class="text-yellow-400">
+    <i class="bi {{ icon_on }} text-xl"></i>
+  </a>
+{% else %}
+  <a href="?{{ request.GET.urlencode }}&{{ param_name }}=true"
+     class="text-gray-300 hover:text-yellow-400">
+    <i class="bi {{ icon_off }} text-xl"></i>
+  </a>
+{% endif %}
