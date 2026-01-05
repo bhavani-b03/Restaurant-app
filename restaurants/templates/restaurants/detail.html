@@ -70,17 +70,17 @@
   </div>
 
 <div class="flex items-center gap-3">
-    <button 
-      class="visit-btn px-4 py-1.5 rounded-md font-semibold text-white
-             {% if restaurant.is_visited %}bg-red-700 hover:bg-red-800{% else %}bg-red-500 hover:bg-red-600{% endif %}"
-      data-id="{{ restaurant.id }}"
-      onclick="toggleVisited(event)">
-      {% if restaurant.is_visited %}
-        Unvisit
-      {% else %}
-        Visit
-      {% endif %}
+  <form method="post" action="{% url 'restaurants:toggle_visited' %}">
+    {% csrf_token %}
+    <input type="hidden" name="restaurant_id" value="{{ restaurant.id }}">
+
+    <button
+      type="submit"
+      class="px-4 py-1.5 rounded-md font-semibold text-white
+            {{ restaurant.is_visited|yesno:'bg-red-700 hover:bg-red-800,bg-red-500 hover:bg-red-600' }}">
+      {{ restaurant.is_visited|yesno:'Unvisit,Visit' }}
     </button>
+  </form>
 
   <!-- View Button -->
   <a 
@@ -96,5 +96,4 @@
 <!-- Ratings & Reviews -->
 {% include "reviews/review-ratings.html" %}
 {% include "reviews/review_script.html" %}
-{% include "visited_script.html" %}
 {% endblock %}
