@@ -70,3 +70,8 @@ class RestaurantFilter(django_filters.FilterSet):
         if value and self.request.user.is_authenticated:
             return queryset.filter(bookmarked_by__user=self.request.user)
         return queryset
+    
+    def filter_visited(self, queryset, name, value):
+        if value and self.request.user.is_authenticated:
+            return queryset.filter(visited_by__user=self.request.user)
+        return queryset
